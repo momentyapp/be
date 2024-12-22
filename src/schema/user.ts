@@ -1,15 +1,11 @@
 import { z } from "zod";
 
-const id = z.number().nonnegative().max(4294967295);
-
-const email = z.string().email().max(50);
-
-const name = z
+const username = z
   .string()
   .min(2)
   .max(20)
-  .regex(/^[a-zA-Z0-9_]+$/, {
-    message: "이름은 영어, 숫자, 밑줄(_)만 쓸 수 있어요.",
+  .regex(/^[가-힣a-zA-Z0-9_]+$/, {
+    message: "사용자 이름에는 한글, 영어, 숫자, 밑줄(_)만 쓸 수 있어요.",
   });
 
 const password = z
@@ -21,9 +17,7 @@ const password = z
   });
 
 const userSchema = {
-  id,
-  email,
-  name,
+  username,
   password
 };
 

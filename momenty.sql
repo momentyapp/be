@@ -4,6 +4,7 @@ CREATE TABLE `user` (
   `createdAt` timestamp NOT NULL DEFAULT (NOW()),
   `password` varchar(255) NOT NULL,
   `salt` varchar(255) NOT NULL
+  `photo` varchar(255)
 );
 
 CREATE TABLE `topic` (

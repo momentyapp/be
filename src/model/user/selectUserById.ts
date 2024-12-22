@@ -1,5 +1,7 @@
 import db from "model";
 
+import type { Connection } from "mysql2/promise";
+
 import type { UserRow } from "db";
 import type { QueryResult, QueryResultRow } from "utility";
 
@@ -8,17 +10,20 @@ export interface GetUserByIdProps {
   password?: string;
 }
 
-export default async function getUserById({ id, password }: GetUserByIdProps) {
+export default async function getUserById(
+  { id, password }: GetUserByIdProps,
+  conn: Connection = db
+) {
   let queryResult: QueryResult<UserRow>;
 
   if (password === undefined) {
     queryResult = await db.query<QueryResultRow<UserRow>[]>(
-      "SELECT id, email, name, password, salt FROM user WHERE ?",
+      "SELECT * FROM user WHERE ?",
       { id }
     );
   } else {
     queryResult = await db.query<QueryResultRow<UserRow>[]>(
-      "SELECT id, email, name, password, salt FROM user WHERE ? AND ?",
+      "SELECT * FROM user WHERE ? AND ?",
       [{ id }, { password }]
     );
   }
