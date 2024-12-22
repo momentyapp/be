@@ -14,7 +14,7 @@ export default async function createUser(
   { username, hashedPassword, salt, photo }: CreateUserProps,
   conn: Connection = db
 ) {
-  const queryResult = await db.query<ResultSetHeader>(
+  const queryResult = await conn.query<ResultSetHeader>(
     "INSERT INTO user SET ?",
     {
       username,

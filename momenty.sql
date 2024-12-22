@@ -14,8 +14,8 @@ CREATE TABLE `topic` (
 
 CREATE TABLE `moment` (
   `id` integer PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `userId` integer NOT NULL,
-  `createdAt` timestamp NOT NULL,
+  `userId` integer,
+  `createdAt` timestamp NOT NULL DEFAULT (NOW()),
   `expiresAt` timestamp,
   `text` varchar(255) NOT NULL
 );

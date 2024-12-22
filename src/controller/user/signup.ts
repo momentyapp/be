@@ -1,4 +1,5 @@
 import path from "path";
+import Crypto from "crypto";
 import { z } from "zod";
 import { promises as fs } from "fs";
 import { randomBytes } from "crypto";
@@ -42,7 +43,8 @@ const signup: RequestHandler<
 
   // 프로필 사진 이름 생성
   const photoFilename = req.file
-    ? `${Date.now()}_${req.file.originalname}`
+    ? Crypto.randomBytes(20).toString("hex") +
+      path.extname(req.file.originalname)
     : undefined;
 
   try {
@@ -52,10 +54,7 @@ const signup: RequestHandler<
         username: req.body.username,
         hashedPassword,
         salt,
-        photo:
-          photoFilename !== undefined
-            ? `/files/profile/${photoFilename}`
-            : undefined,
+        photo: photoFilename,
       },
       conn
     );

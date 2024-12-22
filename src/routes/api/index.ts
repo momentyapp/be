@@ -1,6 +1,7 @@
 import express from "express";
 
 import userRouter from "./user";
+import momentRouter from "./moment";
 
 import userErrorHandler from "middleware/error/clientErrorHandler";
 import errorHandler from "middleware/error/errorHandler";
@@ -11,9 +12,10 @@ const apiRouter = express.Router();
 
 // 라우터 등록
 apiRouter.use("/user", userRouter);
+apiRouter.use("/moment", momentRouter);
 
 // 에러 핸들 미들웨어
-apiRouter.use(  
+apiRouter.use(
   zodErrorHandler,
   userErrorHandler,
   serverErrorHandler,

@@ -17,7 +17,7 @@ export default async function deleteUser(
     throw new Error("At least one of id or username must be provided.");
   }
 
-  const queryResult = await db.query<ResultSetHeader>(
+  const queryResult = await conn.query<ResultSetHeader>(
     "DELETE FROM user WHERE id = ? OR username = ? AND password = ?",
     [id, username, password]
   );

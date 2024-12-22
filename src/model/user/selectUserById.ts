@@ -17,12 +17,12 @@ export default async function getUserById(
   let queryResult: QueryResult<UserRow>;
 
   if (password === undefined) {
-    queryResult = await db.query<QueryResultRow<UserRow>[]>(
+    queryResult = await conn.query<QueryResultRow<UserRow>[]>(
       "SELECT * FROM user WHERE ?",
       { id }
     );
   } else {
-    queryResult = await db.query<QueryResultRow<UserRow>[]>(
+    queryResult = await conn.query<QueryResultRow<UserRow>[]>(
       "SELECT * FROM user WHERE ? AND ?",
       [{ id }, { password }]
     );
