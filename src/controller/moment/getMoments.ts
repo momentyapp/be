@@ -6,6 +6,9 @@ import momentSchema from "schema/moment";
 
 import type { ApiResponse } from "api";
 import type { RequestHandler } from "express";
+import getMomentReactions from "cache/moment/getMomentReactions";
+import selectMomentReactions from "model/moment/selectMomentReactions";
+import setMomentReactions from "cache/moment/setMomentReactions";
 
 // 요청 body
 export const GetMomentsRequestBody = z.object({
@@ -57,6 +60,26 @@ const getMoments: RequestHandler<
 
   const results: Moment[] = [];
   for (const moment of moments[0]) {
+    const cachedReactions = await getMomentReactions({ momentId: moment.id });
+    let reactions: { [emoji: string]: number } = {};
+
+    // 캐시에 없으면 DB에서 가져옴
+    if (cachedReactions === null) {
+      (await selectMomentReactions({ momentId: moment.id }))[0].forEach(
+        (row) => {
+          reactions[row.emoji] = row.count;
+        }
+      );
+
+      // 캐시에 저장
+      await setMomentReactions({ momentId: moment.id, reactions });
+    }
+    // 캐시에 있으면 캐시 사용
+    else {
+      const { total, ...emojiOnly } = cachedReactions;
+      reactions = emojiOnly;
+    }
+
     const result: Moment = {
       id: moment.id,
       author:
@@ -79,7 +102,7 @@ const getMoments: RequestHandler<
         id: parseInt(id),
         name: moment.topicNames.split(",")[index],
       })),
-      reactions: {},
+      reactions,
       expiresAt: moment.expiresAt,
     };
 

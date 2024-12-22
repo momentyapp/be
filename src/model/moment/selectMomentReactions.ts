@@ -9,7 +9,8 @@ export interface SelectMomentReactionsProps {
 }
 
 interface MomentReactionCountsRow {
-  [emoji: string]: number;
+  emoji: string;
+  count: number;
 }
 
 export default async function selectMomentReactions(
