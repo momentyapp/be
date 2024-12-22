@@ -60,13 +60,16 @@ const signup: RequestHandler<
     );
 
     // 사용자 생성 실패 시
-    if (queryResult[0].affectedRows === 0)
+    if (queryResult[0].affectedRows === 0) {
+      conn.release();
       throw new ServerError(
         "query",
         "Unable to create user.",
         "사용자를 생성하지 못 했어요."
       );
+    }
   } catch (error) {
+    conn.release();
     if (!(error instanceof Error && isQueryError(error))) return next(error);
 
     // 중복 에러 처리
@@ -88,6 +91,7 @@ const signup: RequestHandler<
     } catch (error) {
       // 파일 저장 실패 시 유저 삭제
       await conn.rollback();
+      conn.release();
 
       return new ServerError(
         "file",

@@ -7,6 +7,9 @@ import trimBodyString from "middleware/common/trimBodyString";
 import postMoment, {
   PostMomentRequestBody,
 } from "controller/moment/postMoment";
+import getMoments, {
+  GetMomentsRequestBody,
+} from "controller/moment/getMoments";
 
 const momentRouter = express.Router();
 
@@ -32,6 +35,13 @@ momentRouter.post(
   trimBodyString,
   validateRequest({ body: PostMomentRequestBody }),
   postMoment
+);
+momentRouter.post(
+  "/get",
+  express.json(),
+  trimBodyString,
+  validateRequest({ body: GetMomentsRequestBody }),
+  getMoments
 );
 
 export default momentRouter;

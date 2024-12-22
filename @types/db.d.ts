@@ -7,30 +7,30 @@ declare module "db" {
     salt: string;
   }
 
-  interface Topic {
+  interface TopicRow {
     id: number;
     name: string;
   }
 
-  interface moment {
+  interface MomentRow {
     id: number;
-    userId: number;
+    userId: number | null;
     createdAt: string;
-    expiresAt?: string;
+    expiresAt: string | null;
     text: string;
   }
 
-  interface moment_photo {
+  interface MomentPhotoRow {
     momentId: number;
     path: number;
   }
 
-  interface moment_topic {
+  interface MomentTopicRow {
     momentId: number;
     topicId: number;
   }
 
-  interface moment_reaction {
+  interface MomentReactionRow {
     momentId: number;
     userId: number;
     emoji: string;

@@ -27,13 +27,15 @@ CREATE TABLE `moment_photo` (
 
 CREATE TABLE `moment_topic` (
   `momentId` integer NOT NULL,
-  `topicId` integer NOT NULL
+  `topicId` integer NOT NULL,
+  UNIQUE(`momentId`, `topicId`)
 );
 
 CREATE TABLE `moment_reaction` (
   `momentId` integer NOT NULL,
   `userId` integer NOT NULL,
-  `emoji` varchar(255) NOT NULL
+  `emoji` varchar(255) NOT NULL,
+  UNIQUE(`momentId`, `userId`)
 );
 
 ALTER TABLE `moment` ADD FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE;

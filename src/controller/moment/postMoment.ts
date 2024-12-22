@@ -19,7 +19,7 @@ import ClientError from "error/ClientError";
 // 요청 body
 export const PostMomentRequestBody = z.object({
   text: momentSchema.text,
-  topicIds: momentSchema.topicIds,
+  topicIds: momentSchema.stringTopicIds,
   expiresIn: momentSchema.expiresIn,
 });
 
@@ -47,9 +47,10 @@ const postMoment: RequestHandler<
       )
     : undefined;
 
+  // 모멘트 생성
+  let queryResult;
   try {
-    // 모멘트 생성
-    const queryResult = await createMoment(
+    queryResult = await createMoment(
       {
         userId: req.userId,
         text: req.body.text,
@@ -61,13 +62,16 @@ const postMoment: RequestHandler<
     );
 
     // 모멘트 생성 실패 시
-    if (queryResult[0].affectedRows === 0)
+    if (queryResult[0].affectedRows === 0) {
+      conn.release();
       throw new ServerError(
         "query",
         "Unable to post moment.",
         "모멘트를 게시하지 못 했어요."
       );
+    }
   } catch (error) {
+    conn.release();
     if (!(error instanceof Error && isQueryError(error))) return next(error);
 
     // 중복 에러 처리
@@ -90,6 +94,7 @@ const postMoment: RequestHandler<
     } catch (error) {
       // 파일 저장 실패 시 모멘트 삭제
       await conn.rollback();
+      conn.release();
 
       return new ServerError(
         "file",
@@ -106,6 +111,9 @@ const postMoment: RequestHandler<
   return res.status(200).json({
     message: "모멘트가 게시됐어요.",
     code: "success",
+    result: {
+      momentId: queryResult[0].insertId,
+    },
   });
 };
 
