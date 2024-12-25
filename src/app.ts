@@ -22,6 +22,11 @@ const corsOptions: cors.CorsOptions = isProduction
     }
   : {};
 
+app.use((req, res, next) => {
+  log(`${req.method} ${req.url}`);
+  next();
+});
+
 app.use(express.json());
 app.use(cors(corsOptions));
 

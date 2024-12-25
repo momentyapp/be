@@ -3,6 +3,7 @@ import multer from "multer";
 
 import validateRequest from "middleware/validate/validateRequest";
 import trimBodyString from "middleware/common/trimBodyString";
+import parseJSON from "middleware/common/parseJSON";
 import requireUserToken from "middleware/token/requireUserToken";
 
 import postMoment, {
@@ -35,7 +36,9 @@ const upload = multer({
 // 컨트롤러
 momentRouter.post(
   "/",
+  requireUserToken,
   upload.array("photos"),
+  parseJSON,
   trimBodyString,
   validateRequest({ body: PostMomentRequestBody }),
   postMoment

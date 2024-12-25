@@ -3,6 +3,7 @@ import multer from "multer";
 
 import validateRequest from "middleware/validate/validateRequest";
 import trimBodyString from "middleware/common/trimBodyString";
+import parseJSON from "middleware/common/parseJSON";
 
 import signup, { SignupRequestBody } from "controller/user/signup";
 
@@ -27,6 +28,7 @@ const upload = multer({
 userRouter.post(
   "/",
   upload.single("photo"),
+  parseJSON,
   trimBodyString,
   validateRequest({ body: SignupRequestBody }),
   signup

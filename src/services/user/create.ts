@@ -46,6 +46,7 @@ export default async function create({ password, username, photo }: Props) {
 
     // 사용자 생성 실패 시
     if (queryResult[0].affectedRows === 0) {
+      conn.rollback();
       conn.release();
       throw new ServerError(
         "query",
@@ -54,6 +55,7 @@ export default async function create({ password, username, photo }: Props) {
       );
     }
   } catch (error) {
+    conn.rollback();
     conn.release();
     if (!(error instanceof Error && isQueryError(error))) throw error;
 

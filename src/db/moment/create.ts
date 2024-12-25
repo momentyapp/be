@@ -28,7 +28,7 @@ export default async function create(
     expiresIn !== undefined ? expiresIn * 60 * 60 * 1000 : null;
 
   // 모멘트 생성
-  const queryResult = await conn.execute<ResultSetHeader>(
+  const queryResult = await conn.query<ResultSetHeader>(
     "INSERT INTO moment SET ?",
     {
       userId,

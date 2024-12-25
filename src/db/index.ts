@@ -1,7 +1,10 @@
 import mysql from "mysql2";
+import dotenv from "dotenv";
 
 import * as moment from "./moment";
 import * as user from "./user";
+
+dotenv.config();
 
 export const pool = mysql
   .createPool({

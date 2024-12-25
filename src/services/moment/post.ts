@@ -54,6 +54,7 @@ export default async function post({
 
     // 모멘트 생성 실패 시
     if (queryResult[0].affectedRows === 0) {
+      conn.rollback();
       conn.release();
       throw new ServerError(
         "query",
@@ -62,11 +63,15 @@ export default async function post({
       );
     }
   } catch (error) {
+    conn.rollback();
     conn.release();
     if (!(error instanceof Error && isQueryError(error))) throw error;
 
     // 주제가 존재하지 않을 때
-    if (error.code === "ER_NO_REFERENCED_ROW_2") {
+    if (
+      error.code === "ER_NO_REFERENCED_ROW_2" &&
+      error.message.includes("topicId")
+    ) {
       throw new ClientError("존재하지 않는 주제예요.");
     }
 
