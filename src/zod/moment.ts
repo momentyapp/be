@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import topicSchema from "./topic";
+import topicZod from "./topic";
 
 const id = z.number().nonnegative();
 
@@ -11,7 +11,7 @@ const stringTopicIds = z.string().refine((arg) => {
     const ids = JSON.parse(arg);
     if (!Array.isArray(ids)) return false;
     for (const id of ids) {
-      if (!topicSchema.id.safeParse(id).success) return false;
+      if (!topicZod.id.safeParse(id).success) return false;
     }
     return true;
   } catch (e) {
@@ -19,13 +19,13 @@ const stringTopicIds = z.string().refine((arg) => {
   }
 }, "주제 아이디 목록이 올바르지 않아요.");
 
-const topicIds = z.array(topicSchema.id);
+const topicIds = z.array(topicZod.id);
 
 const expiresIn = z.coerce.number().int().min(1).max(72).optional();
 
 const emoji = z.string().emoji();
 
-const momentSchema = {
+const momentZod = {
   id,
   text,
   stringTopicIds,
@@ -34,4 +34,4 @@ const momentSchema = {
   emoji,
 };
 
-export default momentSchema;
+export default momentZod;

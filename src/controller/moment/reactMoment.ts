@@ -1,22 +1,21 @@
 import { z } from "zod";
 
-import upsertMomentReaction from "model/moment/upsertMomentReaction";
+import db from "db";
 
 import isQueryError from "util/isQueryError";
 
 import ServerError from "error/ServerError";
 
-import momentSchema from "schema/moment";
+import momentZod from "zod/moment";
 
 import type { ApiResponse } from "api";
 import type { RequestHandler } from "express";
 import ClientError from "error/ClientError";
-import deleteMomentReaction from "model/moment/deleteMomentReaction";
 
 // 요청 body
 export const ReactMomentRequestBody = z.object({
-  momentId: momentSchema.id,
-  emoji: momentSchema.emoji.optional(),
+  momentId: momentZod.id,
+  emoji: momentZod.emoji.optional(),
 });
 
 // 응답 body
@@ -46,7 +45,7 @@ const reactMoment: RequestHandler<
   // 모멘트 반응 추가
   if (req.body.emoji !== undefined) {
     try {
-      await upsertMomentReaction({
+      await db.moment.react({
         userId,
         momentId: req.body.momentId,
         emoji: req.body.emoji,
@@ -64,7 +63,7 @@ const reactMoment: RequestHandler<
   }
   // 모멘트 반응 제거
   else {
-    const queryResult = await deleteMomentReaction({
+    const queryResult = await db.moment.deleteReaction({
       userId,
       momentId: req.body.momentId,
     });

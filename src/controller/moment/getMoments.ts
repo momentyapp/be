@@ -1,19 +1,17 @@
 import { z } from "zod";
 
 import cache from "cache";
+import db from "db";
 
-import selectMomentsByTopicId from "model/moment/selectMomentsByTopicId";
-import selectMomentReactions from "model/moment/selectMomentReactions";
-
-import momentSchema from "schema/moment";
+import momentZod from "zod/moment";
 
 import type { ApiResponse } from "api";
 import type { RequestHandler } from "express";
 
 // 요청 body
 export const GetMomentsRequestBody = z.object({
-  topicIds: momentSchema.topicIds,
-  before: momentSchema.id,
+  topicIds: momentZod.topicIds,
+  before: momentZod.id,
 });
 
 // 응답 body
@@ -53,7 +51,7 @@ const getMoments: RequestHandler<
   ResponseBody,
   z.infer<typeof GetMomentsRequestBody>
 > = async function (req, res, next) {
-  const moments = await selectMomentsByTopicId({
+  const moments = await db.moment.getByTopics({
     topicIds: req.body.topicIds,
     before: req.body.before,
   });
@@ -67,7 +65,7 @@ const getMoments: RequestHandler<
 
     // 캐시에 없으면 DB에서 가져옴
     if (cachedReactions === null) {
-      (await selectMomentReactions({ momentId: moment.id }))[0].forEach(
+      (await db.moment.getReactions({ momentId: moment.id }))[0].forEach(
         (row) => {
           reactions[row.emoji] = row.count;
         }

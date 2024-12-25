@@ -4,9 +4,9 @@ const id = z.number().nonnegative();
 
 const name = z.string().min(1).max(20);
 
-const topicSchema = {
+const topicZod = {
   id,
   name,
 };
 
-export default topicSchema;
+export default topicZod;

@@ -1,10 +1,10 @@
-import db from "model";
+import { pool } from "db";
 
 import type { Connection } from "mysql2/promise";
 
 import type { QueryResultRow } from "utility";
 
-export interface SelectMomentsByTopicIdProps {
+export interface Props {
   topicIds: number[];
   before: number;
 }
@@ -23,11 +23,11 @@ interface MomentRow {
   topicNames: string;
 }
 
-export default async function selectMomentsByTopicId(
-  { topicIds, before }: SelectMomentsByTopicIdProps,
-  conn: Connection = db
+export default async function getByTopics(
+  { topicIds, before }: Props,
+  conn: Connection = pool
 ) {
-  const queryResult = await conn.query<QueryResultRow<MomentRow>[]>(
+  const queryResult = await conn.execute<QueryResultRow<MomentRow>[]>(
     `
     SELECT 
       m.id,

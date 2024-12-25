@@ -4,8 +4,7 @@ import { z } from "zod";
 import { promises as fs } from "fs";
 import { randomBytes } from "crypto";
 
-import db from "model";
-import createUser from "model/user/createUser";
+import db, { pool } from "db";
 
 import DuplicationError from "error/DuplicationError";
 import ServerError from "error/ServerError";
@@ -13,15 +12,15 @@ import ServerError from "error/ServerError";
 import getSaltedHash from "util/getSaltedHash";
 import isQueryError from "util/isQueryError";
 
-import userSchema from "schema/user";
+import userZod from "zod/user";
 
 import type { ApiResponse } from "api";
 import type { RequestHandler } from "express";
 
 // 요청 body
 export const SignupRequestBody = z.object({
-  username: userSchema.username,
-  password: userSchema.password,
+  username: userZod.username,
+  password: userZod.password,
 });
 
 // 응답 body
@@ -34,7 +33,7 @@ const signup: RequestHandler<
   z.infer<typeof SignupRequestBody>
 > = async function (req, res, next) {
   // 트랜잭션 시작
-  const conn = await db.getConnection();
+  const conn = await pool.getConnection();
   await conn.beginTransaction();
 
   // 비밀번호 해싱
@@ -49,7 +48,7 @@ const signup: RequestHandler<
 
   try {
     // 사용자 생성
-    const queryResult = await createUser(
+    const queryResult = await db.user.create(
       {
         username: req.body.username,
         hashedPassword,

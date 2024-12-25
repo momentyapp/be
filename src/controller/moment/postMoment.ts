@@ -3,14 +3,13 @@ import Crypto from "crypto";
 import { z } from "zod";
 import { promises as fs } from "fs";
 
-import db from "model";
-import createMoment from "model/moment/createMoment";
+import db, { pool } from "db";
 
 import isQueryError from "util/isQueryError";
 
 import ServerError from "error/ServerError";
 
-import momentSchema from "schema/moment";
+import momentZod from "zod/moment";
 
 import type { ApiResponse } from "api";
 import type { RequestHandler } from "express";
@@ -18,9 +17,9 @@ import ClientError from "error/ClientError";
 
 // 요청 body
 export const PostMomentRequestBody = z.object({
-  text: momentSchema.text,
-  topicIds: momentSchema.stringTopicIds,
-  expiresIn: momentSchema.expiresIn,
+  text: momentZod.text,
+  topicIds: momentZod.stringTopicIds,
+  expiresIn: momentZod.expiresIn,
 });
 
 // 응답 body
@@ -35,7 +34,7 @@ const postMoment: RequestHandler<
   z.infer<typeof PostMomentRequestBody>
 > = async function (req, res, next) {
   // 트랜잭션 시작
-  const conn = await db.getConnection();
+  const conn = await pool.getConnection();
   await conn.beginTransaction();
 
   // 사진 이름 생성
@@ -50,7 +49,7 @@ const postMoment: RequestHandler<
   // 모멘트 생성
   let queryResult;
   try {
-    queryResult = await createMoment(
+    queryResult = await db.moment.create(
       {
         userId: req.userId,
         text: req.body.text,

@@ -16,9 +16,9 @@ const password = z
     message: "비밀번호는 영어, 숫자를 조합하여야 해요.",
   });
 
-const userSchema = {
+const userZod = {
   username,
-  password
+  password,
 };
 
-export default userSchema;
+export default userZod;
