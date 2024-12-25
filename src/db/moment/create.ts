@@ -8,7 +8,7 @@ interface Props {
   expiresIn?: number;
   text: string;
   photos?: string[];
-  topicsIds?: number[];
+  topicIds?: number[];
 }
 
 /**
@@ -21,7 +21,7 @@ interface Props {
  * @param conn db 연결 객체
  */
 export default async function create(
-  { userId, expiresIn, text, photos, topicsIds }: Props,
+  { userId, expiresIn, text, photos, topicIds }: Props,
   conn: Connection = pool
 ) {
   const expiresInMs =
@@ -51,11 +51,11 @@ export default async function create(
   }
 
   // 주제 추가
-  if (topicsIds !== undefined && topicsIds.length > 0) {
+  if (topicIds !== undefined && topicIds.length > 0) {
     promises.push(
       conn.query<ResultSetHeader>(
         `INSERT INTO moment_topic (momentId, topicId) VALUES ?`,
-        [topicsIds.map((topicId) => [momentId, topicId])]
+        [topicIds.map((topicId) => [momentId, topicId])]
       )
     );
   }

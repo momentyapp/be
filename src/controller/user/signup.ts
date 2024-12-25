@@ -1,18 +1,8 @@
-import path from "path";
-import Crypto from "crypto";
 import { z } from "zod";
-import { promises as fs } from "fs";
-import { randomBytes } from "crypto";
-
-import db, { pool } from "db";
-
-import DuplicationError from "error/DuplicationError";
-import ServerError from "error/ServerError";
-
-import getSaltedHash from "util/getSaltedHash";
-import isQueryError from "util/isQueryError";
 
 import userZod from "zod/user";
+
+import services from "services";
 
 import type { ApiResponse } from "api";
 import type { RequestHandler } from "express";
@@ -32,77 +22,14 @@ const signup: RequestHandler<
   ResponseBody,
   z.infer<typeof SignupRequestBody>
 > = async function (req, res, next) {
-  // 트랜잭션 시작
-  const conn = await pool.getConnection();
-  await conn.beginTransaction();
+  const { file: photo } = req;
+  const { username, password } = req.body;
 
-  // 비밀번호 해싱
-  const salt = randomBytes(32).toString("base64");
-  const hashedPassword = getSaltedHash(req.body.password, salt);
-
-  // 프로필 사진 이름 생성
-  const photoFilename = req.file
-    ? Crypto.randomBytes(20).toString("hex") +
-      path.extname(req.file.originalname)
-    : undefined;
-
-  try {
-    // 사용자 생성
-    const queryResult = await db.user.create(
-      {
-        username: req.body.username,
-        hashedPassword,
-        salt,
-        photo: photoFilename,
-      },
-      conn
-    );
-
-    // 사용자 생성 실패 시
-    if (queryResult[0].affectedRows === 0) {
-      conn.release();
-      throw new ServerError(
-        "query",
-        "Unable to create user.",
-        "사용자를 생성하지 못 했어요."
-      );
-    }
-  } catch (error) {
-    conn.release();
-    if (!(error instanceof Error && isQueryError(error))) return next(error);
-
-    // 중복 에러 처리
-    if (error.code === "ER_DUP_ENTRY") {
-      if (error.message.includes("username"))
-        return next(new DuplicationError("사용자 이름"));
-    }
-
-    return next(error);
-  }
-
-  // 프로필 사진 저장
-  if (photoFilename !== undefined && req.file) {
-    try {
-      await fs.writeFile(
-        path.resolve("files/profile", photoFilename),
-        req.file.buffer
-      );
-    } catch (error) {
-      // 파일 저장 실패 시 유저 삭제
-      await conn.rollback();
-      conn.release();
-
-      return new ServerError(
-        "file",
-        "Unable to save profile photo.",
-        "프로필 사진을 저장하지 못 했어요."
-      );
-    }
-  }
-
-  // 트랜잭션 커밋
-  await conn.commit();
-  conn.release();
+  await services.user.create({
+    username,
+    password,
+    photo,
+  });
 
   return res.status(200).json({
     message: "사용자가 생성됐어요.",

@@ -1,21 +1,17 @@
 import { z } from "zod";
 
-import db from "db";
-
-import isQueryError from "util/isQueryError";
-
 import ServerError from "error/ServerError";
-
 import momentZod from "zod/moment";
+
+import services from "services";
 
 import type { ApiResponse } from "api";
 import type { RequestHandler } from "express";
-import ClientError from "error/ClientError";
 
 // 요청 body
 export const ReactMomentRequestBody = z.object({
   momentId: momentZod.id,
-  emoji: momentZod.emoji.optional(),
+  emoji: z.union([momentZod.emoji, z.null()]),
 });
 
 // 응답 body
@@ -32,6 +28,8 @@ const reactMoment: RequestHandler<
   z.infer<typeof ReactMomentRequestBody>
 > = async function (req, res, next) {
   const userId = req.userId;
+  const { emoji, momentId } = req.body;
+
   if (userId === undefined) {
     return next(
       new ServerError(
@@ -42,43 +40,21 @@ const reactMoment: RequestHandler<
     );
   }
 
-  // 모멘트 반응 추가
-  if (req.body.emoji !== undefined) {
-    try {
-      await db.moment.react({
-        userId,
-        momentId: req.body.momentId,
-        emoji: req.body.emoji,
-      });
-    } catch (error) {
-      if (!(error instanceof Error && isQueryError(error))) return next(error);
+  await services.moment.react({
+    userId,
+    emoji,
+    momentId,
+  });
 
-      // 모멘트가 존재하지 않을 때
-      if (error.code === "ER_NO_REFERENCED_ROW_2") {
-        return next(new ClientError("존재하지 않는 모멘트예요."));
-      }
-
-      return next(error);
-    }
-  }
-  // 모멘트 반응 제거
-  else {
-    const queryResult = await db.moment.deleteReaction({
-      userId,
-      momentId: req.body.momentId,
-    });
-
-    if (queryResult[0].affectedRows === 0)
-      return next(new ClientError("이미 반응을 취소했어요."));
-  }
-
-  // 캐싱
+  const reactions = await services.moment.getReactions({
+    momentId,
+  });
 
   return res.status(200).json({
     message: "모멘트가 게시됐어요.",
     code: "success",
     result: {
-      reactions: {},
+      reactions,
     },
   });
 };

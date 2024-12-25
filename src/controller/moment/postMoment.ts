@@ -1,24 +1,16 @@
-import path from "path";
-import Crypto from "crypto";
 import { z } from "zod";
-import { promises as fs } from "fs";
-
-import db, { pool } from "db";
-
-import isQueryError from "util/isQueryError";
-
-import ServerError from "error/ServerError";
 
 import momentZod from "zod/moment";
+import ServerError from "error/ServerError";
+import services from "services";
 
 import type { ApiResponse } from "api";
 import type { RequestHandler } from "express";
-import ClientError from "error/ClientError";
 
 // 요청 body
 export const PostMomentRequestBody = z.object({
   text: momentZod.text,
-  topicIds: momentZod.stringTopicIds,
+  topicIds: momentZod.topicIds,
   expiresIn: momentZod.expiresIn,
 });
 
@@ -33,85 +25,37 @@ const postMoment: RequestHandler<
   ResponseBody,
   z.infer<typeof PostMomentRequestBody>
 > = async function (req, res, next) {
-  // 트랜잭션 시작
-  const conn = await pool.getConnection();
-  await conn.beginTransaction();
+  const { files, userId } = req;
+  const { text, topicIds, expiresIn } = req.body;
 
-  // 사진 이름 생성
-  const photoFilenames = Array.isArray(req.files)
-    ? req.files.map(
-        (file) =>
-          Crypto.randomBytes(20).toString("hex") +
-          path.extname(file.originalname)
+  if (userId === undefined) {
+    return next(
+      new ServerError(
+        "auth",
+        "Failed to load userID.",
+        "사용자 아이디를 불러오는 데 실패했어요."
       )
-    : undefined;
-
-  // 모멘트 생성
-  let queryResult;
-  try {
-    queryResult = await db.moment.create(
-      {
-        userId: req.userId,
-        text: req.body.text,
-        topicsIds: JSON.parse(req.body.topicIds),
-        expiresIn: Number(req.body.expiresIn),
-        photos: photoFilenames,
-      },
-      conn
     );
+  }
 
-    // 모멘트 생성 실패 시
-    if (queryResult[0].affectedRows === 0) {
-      conn.release();
-      throw new ServerError(
-        "query",
-        "Unable to post moment.",
-        "모멘트를 게시하지 못 했어요."
-      );
-    }
+  let momentId: number;
+  try {
+    momentId = await services.moment.post({
+      photos: Array.isArray(files) ? files : undefined,
+      userId,
+      text,
+      topicIds,
+      expiresIn,
+    });
   } catch (error) {
-    conn.release();
-    if (!(error instanceof Error && isQueryError(error))) return next(error);
-
-    // 주제가 존재하지 않을 때
-    if (error.code === "ER_NO_REFERENCED_ROW_2") {
-      return next(new ClientError("존재하지 않는 주제예요."));
-    }
-
     return next(error);
   }
-
-  // 사진 저장
-  if (photoFilenames !== undefined && Array.isArray(req.files)) {
-    try {
-      for (let i = 0; i < req.files.length; i++) {
-        await fs.writeFile(
-          path.resolve("files/moment", photoFilenames[i]),
-          req.files[i].buffer
-        );
-      }
-    } catch (error) {
-      // 파일 저장 실패 시 모멘트 삭제
-      await conn.rollback();
-      conn.release();
-
-      return new ServerError(
-        "file",
-        "Unable to save moment photo.",
-        "사진을 저장하지 못 했어요."
-      );
-    }
-  }
-
-  // 트랜잭션 커밋
-  await conn.commit();
-  conn.release();
 
   return res.status(200).json({
     message: "모멘트가 게시됐어요.",
     code: "success",
     result: {
-      momentId: queryResult[0].insertId,
+      momentId,
     },
   });
 };

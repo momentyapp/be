@@ -6,7 +6,7 @@ import type { QueryResultRow } from "utility";
 
 export interface Props {
   topicIds: number[];
-  before: number;
+  before?: number;
   userId?: number;
 }
 
@@ -77,7 +77,7 @@ export default async function getByTopics(
       m.id DESC
     LIMIT 10
     `,
-    [userId || null, topicIds, before]
+    [userId || null, topicIds, before ?? 2147483647]
   );
 
   return queryResult;

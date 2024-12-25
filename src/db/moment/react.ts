@@ -9,6 +9,13 @@ interface Props {
   emoji: string;
 }
 
+/**
+ * @description 모멘트에 반응을 추가하거나 수정합니다.
+ * @param userId 반응을 추가하는 사용자의 아이디
+ * @param momentId 반응을 추가하는 모멘트의 아이디
+ * @param emoji 추가할 반응
+ * @param conn db 연결 객체
+ */
 export default async function react(
   { userId, momentId, emoji }: Props,
   conn: Connection = pool
