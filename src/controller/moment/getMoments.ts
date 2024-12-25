@@ -1,7 +1,6 @@
 import { z } from "zod";
 
-import getMomentReactions from "cache/moment/getMomentReactions";
-import setMomentReactions from "cache/moment/setMomentReactions";
+import cache from "cache";
 
 import selectMomentsByTopicId from "model/moment/selectMomentsByTopicId";
 import selectMomentReactions from "model/moment/selectMomentReactions";
@@ -61,7 +60,9 @@ const getMoments: RequestHandler<
 
   const results: Moment[] = [];
   for (const moment of moments[0]) {
-    const cachedReactions = await getMomentReactions({ momentId: moment.id });
+    const cachedReactions = await cache.moment.getReactions({
+      momentId: moment.id,
+    });
     let reactions: { [emoji: string]: number } = {};
 
     // 캐시에 없으면 DB에서 가져옴
@@ -73,7 +74,7 @@ const getMoments: RequestHandler<
       );
 
       // 캐시에 저장
-      await setMomentReactions({ momentId: moment.id, reactions });
+      await cache.moment.setReactions({ momentId: moment.id, reactions });
     }
     // 캐시에 있으면 캐시 사용
     else {

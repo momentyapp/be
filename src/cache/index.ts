@@ -1,6 +1,9 @@
 import * as redis from "redis";
 
-const redisClient = redis.createClient();
+import * as moment from "./moment";
+
+export const redisClient = redis.createClient();
 redisClient.connect();
 
-export default redisClient;
+const cache = { moment };
+export default cache;
