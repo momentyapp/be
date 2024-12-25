@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import cache from "cache";
 import db from "db";
 
 import momentZod from "zod/moment";
@@ -43,6 +42,7 @@ interface Moment {
     [reaction: string]: number;
   };
   expiresAt?: string;
+  myEmoji?: string;
 }
 
 // 핸들러
@@ -51,59 +51,72 @@ const getMoments: RequestHandler<
   ResponseBody,
   z.infer<typeof GetMomentsRequestBody>
 > = async function (req, res, next) {
+  const userId = req.userId;
+
   const moments = await db.moment.getByTopics({
     topicIds: req.body.topicIds,
     before: req.body.before,
+    userId,
   });
 
   const results: Moment[] = [];
   for (const moment of moments[0]) {
-    const cachedReactions = await cache.moment.getReactions({
-      momentId: moment.id,
-    });
-    let reactions: { [emoji: string]: number } = {};
-
-    // 캐시에 없으면 DB에서 가져옴
-    if (cachedReactions === null) {
-      (await db.moment.getReactions({ momentId: moment.id }))[0].forEach(
-        (row) => {
-          reactions[row.emoji] = row.count;
-        }
-      );
-
-      // 캐시에 저장
-      await cache.moment.setReactions({ momentId: moment.id, reactions });
-    }
-    // 캐시에 있으면 캐시 사용
-    else {
-      const { total, ...emojiOnly } = cachedReactions;
-      reactions = emojiOnly;
+    // 작성자 가져오기
+    let author: Moment["author"] = undefined;
+    if (
+      moment.userId !== null &&
+      moment.username !== null &&
+      moment.userCreatedAt !== null
+    ) {
+      author = {
+        id: moment.userId,
+        username: moment.username,
+        createdAt: moment.userCreatedAt,
+        photo: moment.userPhoto ?? undefined,
+      };
     }
 
+    // 본문 가져오기
+    const body: Moment["body"] = {
+      text: moment.text,
+    };
+    if (moment.photos !== null) {
+      body.photos = moment.photos.split(",");
+    }
+
+    // 주제 가져오기
+    const topics: Moment["topics"] = [];
+    if (moment.topicIds !== null && moment.topicNames !== null) {
+      const topicIds = moment.topicIds.split(",");
+      const topicNames = moment.topicNames.split(",");
+      for (let i = 0; i < topicIds.length; i++) {
+        topics.push({
+          id: parseInt(topicIds[i]),
+          name: topicNames[i],
+        });
+      }
+    }
+
+    // 반응 가져오기
+    const reactions: Moment["reactions"] = {};
+    if (moment.emojis !== null) {
+      const emojis = moment.emojis.split(",");
+      for (const emoji of emojis) {
+        const [reaction, count] = emoji.split(":");
+        reactions[reaction] = parseInt(count);
+      }
+    }
+
+    // 모멘트 객체 생성
     const result: Moment = {
       id: moment.id,
-      author:
-        moment.userId === null ||
-        moment.username === null ||
-        moment.userCreatedAt === null
-          ? undefined
-          : {
-              id: moment.userId,
-              username: moment.username,
-              createdAt: moment.userCreatedAt,
-              photo: moment.userPhoto ?? undefined,
-            },
+      author,
       createdAt: moment.createdAt,
-      body: {
-        text: moment.text,
-        photos: moment.photos ? moment.photos.split(",") : undefined,
-      },
-      topics: moment.topicIds.split(",").map((id, index) => ({
-        id: parseInt(id),
-        name: moment.topicNames.split(",")[index],
-      })),
+      body,
+      topics,
       reactions,
       expiresAt: moment.expiresAt,
+      myEmoji: moment.myEmoji ?? undefined,
     };
 
     results.push(result);
