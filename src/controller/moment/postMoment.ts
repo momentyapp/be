@@ -74,7 +74,7 @@ const postMoment: RequestHandler<
     conn.release();
     if (!(error instanceof Error && isQueryError(error))) return next(error);
 
-    // 중복 에러 처리
+    // 주제가 존재하지 않을 때
     if (error.code === "ER_NO_REFERENCED_ROW_2") {
       return next(new ClientError("존재하지 않는 주제예요."));
     }

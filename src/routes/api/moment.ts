@@ -3,6 +3,7 @@ import multer from "multer";
 
 import validateRequest from "middleware/validate/validateRequest";
 import trimBodyString from "middleware/common/trimBodyString";
+import requireUserToken from "middleware/token/requireUserToken";
 
 import postMoment, {
   PostMomentRequestBody,
@@ -10,6 +11,9 @@ import postMoment, {
 import getMoments, {
   GetMomentsRequestBody,
 } from "controller/moment/getMoments";
+import reactMoment, {
+  ReactMomentRequestBody,
+} from "controller/moment/reactMoment";
 
 const momentRouter = express.Router();
 
@@ -42,6 +46,14 @@ momentRouter.post(
   trimBodyString,
   validateRequest({ body: GetMomentsRequestBody }),
   getMoments
+);
+momentRouter.post(
+  "/reaction",
+  express.json(),
+  requireUserToken,
+  trimBodyString,
+  validateRequest({ body: ReactMomentRequestBody }),
+  reactMoment
 );
 
 export default momentRouter;

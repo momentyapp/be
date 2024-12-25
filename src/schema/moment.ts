@@ -23,12 +23,15 @@ const topicIds = z.array(topicSchema.id);
 
 const expiresIn = z.coerce.number().int().min(1).max(72).optional();
 
+const emoji = z.string().emoji();
+
 const momentSchema = {
   id,
   text,
   stringTopicIds,
   topicIds,
   expiresIn,
+  emoji,
 };
 
 export default momentSchema;
