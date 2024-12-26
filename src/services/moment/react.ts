@@ -1,4 +1,6 @@
 import db from "db";
+import cache from "cache";
+
 import ClientError from "error/ClientError";
 import isQueryError from "util/isQueryError";
 
@@ -40,4 +42,12 @@ export default async function react({ userId, emoji, momentId }: Props) {
       throw new ClientError("이미 반응을 취소했어요.");
     }
   }
+
+  // DB에서 조회
+  const reactionRows = await db.moment.getReactions({ momentId });
+  const reactions: Record<string, number> = {};
+
+  // DB에서 조회한 데이터를 캐시에 저장
+  for (const row of reactionRows[0]) reactions[row.emoji] = row.count;
+  cache.moment.setReactions({ momentId, reactions });
 }

@@ -3,8 +3,8 @@ import debug from "debug";
 
 export default class TrendScoreUpdater {
   private static timeout: NodeJS.Timeout | null = null;
-  private static lastReactions: { [momentId: number]: number };
-  private static lastViews: { [momentId: number]: number };
+  private static lastReactions: { [momentId: number]: number } | undefined;
+  private static lastViews: { [momentId: number]: number } | undefined;
 
   private static log = debug("app:log:trend_score_updater");
 
@@ -21,10 +21,10 @@ export default class TrendScoreUpdater {
       ...new Set(...Object.keys(reactions ?? {}), ...Object.keys(views ?? {})),
     ].map((id) => parseInt(id));
 
-    const results = await Promise.all(
+    await Promise.all(
       momentIds.map(async (momentId) => {
-        const lastR = TrendScoreUpdater.lastReactions[momentId] ?? 0;
-        const lastV = TrendScoreUpdater.lastViews[momentId] ?? 0;
+        const lastR = TrendScoreUpdater.lastReactions?.[momentId] ?? 0;
+        const lastV = TrendScoreUpdater.lastViews?.[momentId] ?? 0;
 
         const r = reactions?.[momentId] ?? 0;
         const v = views?.[momentId] ?? 0;
@@ -33,14 +33,12 @@ export default class TrendScoreUpdater {
         const vRate = (v - lastV) / (lastV + 1);
 
         const score = rRate * 0.7 + vRate * 0.3;
-        return await cache.moment.setTrendScore({ momentId, score });
+        await cache.moment.setTrendScore({ momentId, score });
       })
     );
 
     TrendScoreUpdater.log(
-      `Updated trend scores of ${results.filter((r) => r).length} / ${
-        momentIds.length
-      } moments`
+      `Updated trend scores of ${momentIds.length} moments`
     );
   }
 

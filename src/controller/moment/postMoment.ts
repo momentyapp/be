@@ -54,9 +54,7 @@ const postMoment: RequestHandler<
   return res.status(200).json({
     message: "모멘트가 게시됐어요.",
     code: "success",
-    result: {
-      momentId,
-    },
+    result: { momentId },
   });
 };
 

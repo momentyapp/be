@@ -51,7 +51,7 @@ const reactMoment: RequestHandler<
   });
 
   return res.status(200).json({
-    message: "모멘트가 게시됐어요.",
+    message: "반응을 등록했어요.",
     code: "success",
     result: {
       reactions,

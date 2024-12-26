@@ -22,15 +22,12 @@ export default async function react(
 ) {
   const queryResult = await conn.execute<ResultSetHeader>(
     `
-    INSERT INTO moment_reaction SET ?
+    INSERT INTO moment_reaction (userId, momentId, emoji)
+    VALUES (?, ?, ?)
     ON DUPLICATE KEY UPDATE
         emoji = VALUES(emoji)
     `,
-    {
-      userId,
-      momentId,
-      emoji,
-    }
+    [userId, momentId, emoji]
   );
 
   return queryResult;

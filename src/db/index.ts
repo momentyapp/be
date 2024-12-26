@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 
 import * as moment from "./moment";
 import * as user from "./user";
+import * as topic from "./topic";
 
 dotenv.config();
 
@@ -15,5 +16,5 @@ export const pool = mysql
   })
   .promise();
 
-const db = { moment, user };
+const db = { moment, user, topic };
 export default db;

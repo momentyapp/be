@@ -16,6 +16,7 @@ interface Props {
 export default async function setReactions({ momentId, reactions }: Props) {
   const total = Object.values(reactions).reduce((acc, cur) => acc + cur, 0);
   const result = await Promise.all([
+    redis.del(`moment:${momentId}:reaction`),
     ...Object.keys(reactions).map((emoji) =>
       redis.hSet(`moment:${momentId}:reaction`, emoji, reactions[emoji])
     ),

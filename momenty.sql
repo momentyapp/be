@@ -10,6 +10,7 @@ CREATE TABLE `user` (
 CREATE TABLE `topic` (
   `id` integer PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL
+  UNIQUE(`name`)
 );
 
 CREATE TABLE `moment` (
