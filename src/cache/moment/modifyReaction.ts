@@ -18,12 +18,12 @@ export default async function modifyReaction({
   emoji,
   amount,
 }: Props) {
-  if ((await redis.exists(`moment:${momentId}:reaction`)) === 0) return false;
   const result = await redis.hIncrBy(
     `moment:${momentId}:reaction`,
     emoji,
     amount
   );
+  redis.hIncrBy(`moment_reaction`, momentId.toString(), amount);
   if (result === 0) return false;
   return true;
 }

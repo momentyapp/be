@@ -19,7 +19,7 @@ export default async function setReactions({ momentId, reactions }: Props) {
     ...Object.keys(reactions).map((emoji) =>
       redis.hSet(`moment:${momentId}:reaction`, emoji, reactions[emoji])
     ),
-    redis.hSet(`moment:${momentId}:reaction`, "total", total),
+    redis.hSet(`moment_reaction`, momentId.toString(), total),
   ]);
 
   if (result.includes(0)) return false;

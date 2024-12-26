@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import express from "express";
 
 import apiRouter from "routes/api";
+import TrendScoreUpdater from "util/updateTrendScores";
 
 dotenv.config();
 const isProduction = process.env.NODE_ENV === "production";
@@ -21,6 +22,9 @@ const corsOptions: cors.CorsOptions = isProduction
       origin: "https://example.com",
     }
   : {};
+
+// trendScoreUpdater
+TrendScoreUpdater.start();
 
 app.use((req, res, next) => {
   log(`${req.method} ${req.url}`);
