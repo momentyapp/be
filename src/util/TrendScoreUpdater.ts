@@ -9,8 +9,8 @@ export default class TrendScoreUpdater {
   private static log = debug("app:log:trend_score_updater");
 
   private static async update() {
-    let reactions: Record<string, number> | null;
-    let views: Record<string, number> | null;
+    let reactions: Record<number, number> | null;
+    let views: Record<number, number> | null;
 
     await Promise.all([
       (reactions = await cache.moment.getReactionCounts()),
@@ -18,7 +18,10 @@ export default class TrendScoreUpdater {
     ]);
 
     const momentIds = [
-      ...new Set(...Object.keys(reactions ?? {}), ...Object.keys(views ?? {})),
+      ...new Set([
+        ...Object.keys(reactions ?? {}),
+        ...Object.keys(views ?? {}),
+      ]),
     ].map((id) => parseInt(id));
 
     await Promise.all(
@@ -29,10 +32,12 @@ export default class TrendScoreUpdater {
         const r = reactions?.[momentId] ?? 0;
         const v = views?.[momentId] ?? 0;
 
-        const rRate = (r - lastR) / (lastR + 1);
-        const vRate = (v - lastV) / (lastV + 1);
+        const rGrowth = (r - lastR) / (lastR + 1);
+        const vGrowth = (v - lastV) / (lastV + 1);
 
-        const score = rRate * 0.7 + vRate * 0.3;
+        const score = (rGrowth * 7 + vGrowth * 3) * 7 + (r * 7 + v * 3) * 3;
+
+        if (score < 200) return;
         await cache.moment.setTrendScore({ momentId, score });
       })
     );

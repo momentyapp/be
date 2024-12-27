@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import express from "express";
 
 import apiRouter from "routes/api";
-import TrendScoreUpdater from "util/updateTrendScores";
+import TrendScoreUpdater from "util/TrendScoreUpdater";
 
 dotenv.config();
 const isProduction = process.env.NODE_ENV === "production";

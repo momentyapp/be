@@ -5,9 +5,9 @@ import { redisClient as redis } from "cache";
  * @returns 모든 모멘트의 노출 시간을 반환합니다. 반환할 정보가 없을 경우 null을 반환합니다.
  */
 export default async function getViews() {
-  if ((await redis.exists(`moment_views`) === 0)) return null;
+  if ((await redis.exists(`moment_views`)) === 0) return null;
   const result = await redis.hGetAll(`moment_views`);
-  const parsedResult: Record<string, number> = {};
-  for (const key in result) parsedResult[key] = parseInt(result[key]);
+  const parsedResult: Record<number, number> = {};
+  for (const key in result) parsedResult[parseInt(key)] = parseInt(result[key]);
   return parsedResult;
 }

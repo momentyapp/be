@@ -7,7 +7,7 @@ import { redisClient as redis } from "cache";
 export default async function getReactionCounts() {
   if ((await redis.exists(`moment_reaction`)) === 0) return null;
   const result = await redis.hGetAll(`moment_reaction`);
-  const parsedResult: Record<string, number> = {};
-  for (const key in result) parsedResult[key] = parseInt(result[key]);
+  const parsedResult: Record<number, number> = {};
+  for (const key in result) parsedResult[parseInt(key)] = parseInt(result[key]);
   return parsedResult;
 }
