@@ -69,7 +69,7 @@ const getMoments: RequestHandler<
     code: "success",
     result: {
       count: moments.length,
-      moments: moments,
+      moments,
     },
   });
 };

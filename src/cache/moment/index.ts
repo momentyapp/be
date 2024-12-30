@@ -6,6 +6,7 @@ import increaseView from "./increaseView";
 import getViews from "./getViews";
 import getReactionCounts from "./getReactionCounts";
 import setTrendScore from "./setTrendScore";
+import getTrendings from "./getTrendings";
 
 export {
   getEmojiCount,
@@ -16,4 +17,5 @@ export {
   getViews,
   getReactionCounts,
   setTrendScore,
+  getTrendings,
 };

@@ -15,6 +15,9 @@ import getMoments, {
 import reactMoment, {
   ReactMomentRequestBody,
 } from "controller/moment/reactMoment";
+import getTrendingMoments, {
+  GetTrendingMomentsRequestQuery,
+} from "controller/moment/getTrendingMoments";
 
 const momentRouter = express.Router();
 
@@ -57,6 +60,11 @@ momentRouter.post(
   trimBodyString,
   validateRequest({ body: ReactMomentRequestBody }),
   reactMoment
+);
+momentRouter.get(
+  "/trend",
+  validateRequest({ query: GetTrendingMomentsRequestQuery }),
+  getTrendingMoments
 );
 
 export default momentRouter;
