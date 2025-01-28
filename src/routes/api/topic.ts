@@ -9,6 +9,7 @@ import createTopic, {
 import getTrendingTopics, {
   GetTrendingTopicsRequestQuery,
 } from "controller/topic/getTrendingTopics";
+import searchTopic, { SearchTopicQuery } from "controller/topic/searchTopic";
 
 const topicRouter = express.Router();
 
@@ -23,6 +24,11 @@ topicRouter.get(
   "/trend",
   validateRequest({ query: GetTrendingTopicsRequestQuery }),
   getTrendingTopics
+);
+topicRouter.get(
+  "/search",
+  validateRequest({ query: SearchTopicQuery }),
+  searchTopic
 );
 
 export default topicRouter;
