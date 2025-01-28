@@ -9,9 +9,7 @@ import type { RequestHandler } from "express";
 import type { Topic } from "common";
 
 // 요청 body
-export const GetTrendingTopicsRequestQuery = z.object({
-  start: z.number().int().nonnegative(),
-});
+export const GetTrendingTopicsRequestQuery = z.object({});
 
 // 응답 body
 type ResponseBody = ApiResponse<{
