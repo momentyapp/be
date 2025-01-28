@@ -23,11 +23,11 @@ export default async function getByIds(
   { topicIds }: Props,
   conn: Connection = pool
 ) {
-  const queryResult = await conn.execute<QueryResultRow<Row>[]>(
+  const queryResult = await conn.query<QueryResultRow<Row>[]>(
     `
     SELECT id, name FROM topic WHERE id IN (?)
     `,
-    [topicIds.join(",")]
+    [topicIds]
   );
 
   return queryResult;
