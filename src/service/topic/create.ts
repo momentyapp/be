@@ -4,6 +4,7 @@ import isQueryError from "util/isQueryError";
 
 import ServerError from "error/ServerError";
 import ClientError from "error/ClientError";
+import Service from "service";
 
 interface Props {
   name: string;
@@ -34,6 +35,7 @@ export default async function create({ name }: Props) {
     throw error;
   }
 
-  const momentId = queryResult[0].insertId;
-  return momentId;
+  const topicId = queryResult[0].insertId;
+  Service.topic.increaseUsage({ topicId });
+  return topicId;
 }
