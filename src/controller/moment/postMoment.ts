@@ -1,8 +1,10 @@
 import { z } from "zod";
 
+import Service from "service";
+
 import momentZod from "zod/moment";
+
 import ServerError from "error/ServerError";
-import services from "services";
 
 import type { ApiResponse } from "api";
 import type { RequestHandler } from "express";
@@ -40,7 +42,7 @@ const postMoment: RequestHandler<
 
   let momentId: number;
   try {
-    momentId = await services.moment.post({
+    momentId = await Service.moment.post({
       photos: Array.isArray(files) ? files : undefined,
       userId,
       text,

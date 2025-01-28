@@ -1,5 +1,5 @@
 import db from "db";
-import services from "services";
+import Service from "service";
 
 interface Props {
   topicIds: number[];
@@ -14,7 +14,7 @@ export default async function get({ topicIds, before, userId }: Props) {
     userId,
   });
 
-  const moments = services.moment.convertRows({ momentRows: momentRows[0] });
+  const moments = Service.moment.convertRows({ momentRows: momentRows[0] });
 
   return moments;
 }

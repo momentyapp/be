@@ -1,5 +1,3 @@
-import db from "db";
-
 import type { Moment } from "controller/moment/getMoments";
 import { QueryResultRow } from "utility";
 

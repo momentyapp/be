@@ -1,10 +1,12 @@
 import { z } from "zod";
 
-import services from "services";
+import Service from "service";
+
+import ServerError from "error/ServerError";
 
 import type { ApiResponse } from "api";
 import type { RequestHandler } from "express";
-import ServerError from "error/ServerError";
+import type { Moment } from "common";
 
 // 요청 body
 export const GetTrendingMomentsRequestQuery = z.object({
@@ -16,32 +18,6 @@ type ResponseBody = ApiResponse<{
   count: number;
   moments: Moment[];
 }>;
-
-export interface Moment {
-  id: number;
-  author?: {
-    id: number;
-    username: string;
-    createdAt: string;
-    photo?: string;
-  };
-  createdAt: string;
-  body: {
-    text: string;
-    photos?: string[];
-  };
-  topics: {
-    id: number;
-    name: string;
-    trending?: boolean;
-    count?: number;
-  }[];
-  reactions: {
-    [reaction: string]: number;
-  };
-  expiresAt?: string;
-  myEmoji?: string;
-}
 
 // 핸들러
 const getTrendingMoments: RequestHandler<{}, ResponseBody, {}> =
@@ -56,7 +32,7 @@ const getTrendingMoments: RequestHandler<{}, ResponseBody, {}> =
 
     let moments: Moment[];
     try {
-      moments = await services.moment.getTrendings({
+      moments = await Service.moment.getTrendings({
         start,
         userId,
       });

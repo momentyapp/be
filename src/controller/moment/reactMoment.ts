@@ -1,9 +1,10 @@
 import { z } from "zod";
 
-import ServerError from "error/ServerError";
-import momentZod from "zod/moment";
+import Service from "service";
 
-import services from "services";
+import ServerError from "error/ServerError";
+
+import momentZod from "zod/moment";
 
 import type { ApiResponse } from "api";
 import type { RequestHandler } from "express";
@@ -40,13 +41,13 @@ const reactMoment: RequestHandler<
     );
   }
 
-  await services.moment.react({
+  await Service.moment.react({
     userId,
     emoji,
     momentId,
   });
 
-  const reactions = await services.moment.getReactions({
+  const reactions = await Service.moment.getReactions({
     momentId,
   });
 

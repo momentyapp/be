@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-import services from "services";
+import Service from "service";
+
 import momentZod from "zod/moment";
 
 import type { ApiResponse } from "api";
@@ -55,7 +56,7 @@ const getMoments: RequestHandler<
 
   let moments: Moment[];
   try {
-    moments = await services.moment.get({
+    moments = await Service.moment.get({
       topicIds,
       before,
       userId,

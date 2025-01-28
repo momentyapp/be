@@ -1,8 +1,8 @@
 import { z } from "zod";
 
+import Service from "service";
+
 import topicZod from "zod/topic";
-import ServerError from "error/ServerError";
-import services from "services";
 
 import type { ApiResponse } from "api";
 import type { RequestHandler } from "express";
@@ -27,7 +27,7 @@ const createTopic: RequestHandler<
 
   let topicId: number;
   try {
-    topicId = await services.topic.create({ name });
+    topicId = await Service.topic.create({ name });
   } catch (error) {
     return next(error);
   }

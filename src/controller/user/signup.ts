@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import userZod from "zod/user";
+import Service from "service";
 
-import services from "services";
+import userZod from "zod/user";
 
 import type { ApiResponse } from "api";
 import type { RequestHandler } from "express";
@@ -25,7 +25,7 @@ const signup: RequestHandler<
   const { file: photo } = req;
   const { username, password } = req.body;
 
-  await services.user.create({
+  await Service.user.create({
     username,
     password,
     photo,

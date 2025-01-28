@@ -1,8 +1,9 @@
 import db from "db";
-import cache from "cache";
+import Cache from "cache";
 
 import ClientError from "error/ClientError";
 import isQueryError from "util/isQueryError";
+import Service from "service";
 
 interface Props {
   userId: number;
@@ -11,6 +12,8 @@ interface Props {
 }
 
 export default async function react({ userId, emoji, momentId }: Props) {
+  let reaction = 0;
+
   // 모멘트 반응 추가
   if (emoji !== null) {
     try {
@@ -29,6 +32,9 @@ export default async function react({ userId, emoji, momentId }: Props) {
 
       throw error;
     }
+
+    // 캐시 반영
+    reaction = await Cache.moment.increaseReaction({ momentId });
   }
   // 모멘트 반응 제거
   else {
@@ -41,13 +47,28 @@ export default async function react({ userId, emoji, momentId }: Props) {
     if (queryResult[0].affectedRows === 0) {
       throw new ClientError("이미 반응을 취소했어요.");
     }
+
+    // 캐시 반영
+    reaction = await Cache.moment.decreaseReaction({ momentId });
   }
 
-  // DB에서 조회
-  const reactionRows = await db.moment.getReactions({ momentId });
-  const reactions: Record<string, number> = {};
+  (async () => {
+    // 스냅샷 생성
+    const timestamp = Math.floor(Date.now() / 1000 / 60);
+    const snapshotCount = await Cache.moment.takeReactionSnapshot({
+      momentId,
+      reaction,
+      timestamp,
+    });
 
-  // DB에서 조회한 데이터를 캐시에 저장
-  for (const row of reactionRows[0]) reactions[row.emoji] = row.count;
-  cache.moment.setReactions({ momentId, reactions });
+    // 트렌드 점수 업데이트
+    await Service.moment.updateTrendScore({
+      momentId,
+      snapshotCount,
+      reaction,
+      timestamp,
+    });
+  })();
+
+  return reaction;
 }
