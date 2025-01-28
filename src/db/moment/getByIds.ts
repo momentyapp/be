@@ -36,7 +36,7 @@ export default async function getByIds(
   { userId, momentIds }: Props,
   conn: Connection = pool
 ) {
-  const queryResult = await conn.execute<QueryResultRow<MomentRow>[]>(
+  const queryResult = await conn.query<QueryResultRow<MomentRow>[]>(
     `
     SELECT
       m.id,
@@ -79,7 +79,7 @@ export default async function getByIds(
       m.id DESC
     LIMIT 10
     `,
-    [userId ?? null, momentIds.join(",")]
+    [userId ?? null, momentIds]
   );
 
   return queryResult;
