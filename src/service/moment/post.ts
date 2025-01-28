@@ -8,6 +8,7 @@ import isQueryError from "util/isQueryError";
 
 import ServerError from "error/ServerError";
 import ClientError from "error/ClientError";
+import Service from "service";
 
 interface Props {
   photos?: Express.Multer.File[];
@@ -105,5 +106,7 @@ export default async function post({
   conn.release();
 
   const momentId = queryResult[0].insertId;
+  // 주제 사용 횟수 증가
+  topicIds.forEach((topicId) => Service.topic.increaseUsage({ topicId }));
   return momentId;
 }
