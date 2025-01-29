@@ -9,7 +9,7 @@ import type { RequestHandler } from "express";
 
 // 요청 body
 export const CreateTopicRequestBody = z.object({
-  name: topicZod.name,
+  topic: topicZod.name,
 });
 
 // 응답 body
@@ -23,11 +23,11 @@ const createTopic: RequestHandler<
   ResponseBody,
   z.infer<typeof CreateTopicRequestBody>
 > = async function (req, res, next) {
-  const { name } = req.body;
+  const { topic } = req.body;
 
   let topicId: number;
   try {
-    topicId = await Service.topic.create({ name });
+    topicId = await Service.topic.create({ name: topic });
   } catch (error) {
     return next(error);
   }
