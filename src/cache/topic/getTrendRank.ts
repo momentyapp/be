@@ -5,6 +5,6 @@ interface Props {
 }
 
 export default async function getTrendRank({ topicId }: Props) {
-  const rank = await redis.zRank(`topic_trend`, topicId.toString());
+  const rank = await redis.zRevRank(`topic_trend`, topicId.toString());
   return rank;
 }
