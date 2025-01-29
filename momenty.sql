@@ -18,7 +18,7 @@ CREATE TABLE `moment` (
   `userId` integer,
   `createdAt` timestamp NOT NULL DEFAULT (NOW()),
   `expiresAt` timestamp,
-  `text` varchar(255) NOT NULL
+  `text` text NOT NULL
 );
 
 CREATE TABLE `moment_photo` (
