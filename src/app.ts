@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import express from "express";
 
 import apiRouter from "routes/api";
+import fileRouter from "routes/file";
 
 dotenv.config();
 const isProduction = process.env.NODE_ENV === "production";
@@ -26,6 +27,7 @@ app.use(express.json());
 app.use(cors(corsOptions));
 
 app.use("/api", apiRouter);
+app.use("/file", fileRouter);
 
 app.listen(port, () => {
   log(`Server is running on port ${port}`);
