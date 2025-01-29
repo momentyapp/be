@@ -39,7 +39,6 @@ const upload = multer({
 // 컨트롤러
 momentRouter.post(
   "/",
-  requireUserToken,
   upload.array("photos"),
   parseJSON,
   trimBodyString,

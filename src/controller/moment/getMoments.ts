@@ -10,7 +10,7 @@ import type { RequestHandler } from "express";
 // 요청 body
 export const GetMomentsRequestBody = z.object({
   topicIds: momentZod.topicIds,
-  before: momentZod.id,
+  before: momentZod.id.optional(),
 });
 
 // 응답 body

@@ -4,7 +4,7 @@ import { QueryResultRow } from "utility";
 interface MomentRow {
   id: number;
   createdAt: string;
-  expiresAt: string;
+  expiresAt: string | null;
   text: string;
   userId: number | null;
   username: string | null;
@@ -78,7 +78,7 @@ export default function convertRows({ momentRows }: Props) {
       body,
       topics,
       reactions,
-      expiresAt: moment.expiresAt,
+      expiresAt: moment.expiresAt ?? undefined,
       myEmoji: moment.myEmoji ?? undefined,
     };
 

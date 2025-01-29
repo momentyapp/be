@@ -12,7 +12,7 @@ export interface Props {
 interface MomentRow {
   id: number;
   createdAt: string;
-  expiresAt: string;
+  expiresAt: string | null;
   text: string;
   userId: number | null;
   username: string | null;

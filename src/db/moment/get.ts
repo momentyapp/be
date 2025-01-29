@@ -5,7 +5,6 @@ import type { Connection } from "mysql2/promise";
 import type { QueryResultRow } from "utility";
 
 export interface Props {
-  topicIds: number[];
   before?: number;
   userId?: number;
 }
@@ -27,18 +26,17 @@ interface MomentRow {
 }
 
 /**
- * @description 주제에 해당하는 모멘트를 조회합니다.
- * @param topicIds 조회할 주제 아이디 목록
+ * @description 모멘트를 조회합니다.
  * @param before 조회할 모멘트의 아이디의 상한선
  * @param userId 조회하는 사용자의 아이디
  * @param conn db 연결 객체
  * @returns
  */
-export default async function getByTopics(
-  { topicIds, before, userId }: Props,
+export default async function get(
+  { before, userId }: Props,
   conn: Connection = pool
 ) {
-  const queryResult = await conn.query<QueryResultRow<MomentRow>[]>(
+  const queryResult = await conn.execute<QueryResultRow<MomentRow>[]>(
     `
     SELECT 
       m.id,
@@ -70,14 +68,14 @@ export default async function getByTopics(
       LEFT JOIN moment_topic mt ON m.id = mt.momentId
       LEFT JOIN topic t ON mt.topicId = t.id
     WHERE 
-      t.id IN (?) AND m.id < ?
+      m.id < ?
     GROUP BY 
       m.id, m.createdAt, m.expiresAt, m.text, m.userId, u.username, u.createdAt, u.photo
     ORDER BY 
       m.id DESC
     LIMIT 10
     `,
-    [userId || null, topicIds.join(","), before ?? 2147483647]
+    [userId || null, before ?? 2147483647]
   );
 
   return queryResult;
