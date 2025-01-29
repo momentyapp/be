@@ -27,7 +27,7 @@ export default async function search(
     `
     SELECT id, name FROM topic WHERE name LIKE ?
     `,
-    [query]
+    [`%${query}%`]
   );
 
   return queryResult;
