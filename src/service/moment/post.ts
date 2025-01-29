@@ -12,7 +12,7 @@ import Service from "service";
 
 interface Props {
   photos?: Express.Multer.File[];
-  userId: number;
+  userId?: number;
   text: string;
   topicIds: number[];
   expiresIn?: number;

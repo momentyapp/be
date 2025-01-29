@@ -30,16 +30,6 @@ const postMoment: RequestHandler<
   const { files, userId } = req;
   const { text, topicIds, expiresIn } = req.body;
 
-  if (userId === undefined) {
-    return next(
-      new ServerError(
-        "auth",
-        "Failed to load userID.",
-        "사용자 아이디를 불러오는 데 실패했어요."
-      )
-    );
-  }
-
   let momentId: number;
   try {
     momentId = await Service.moment.post({
