@@ -12,6 +12,8 @@ import updateTopicTrendScore from "./topic/updateTrendScore";
 import getTrendingTopics from "./topic/getTrendings";
 import search from "./topic/search";
 
+import getTopics from "./ai/getTopics";
+
 import createUser from "./user/create";
 
 export default class Service {
@@ -37,5 +39,9 @@ export default class Service {
 
   static user = {
     create: createUser,
+  };
+
+  static ai = {
+    getTopics,
   };
 }

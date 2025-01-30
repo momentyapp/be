@@ -3,6 +3,7 @@ import express from "express";
 import userRouter from "./user";
 import momentRouter from "./moment";
 import topicRouter from "./topic";
+import aiRouter from "./ai";
 
 import userErrorHandler from "middleware/error/clientErrorHandler";
 import errorHandler from "middleware/error/errorHandler";
@@ -15,6 +16,7 @@ const apiRouter = express.Router();
 apiRouter.use("/user", userRouter);
 apiRouter.use("/moment", momentRouter);
 apiRouter.use("/topic", topicRouter);
+apiRouter.use("/ai", aiRouter);
 
 // 에러 핸들 미들웨어
 apiRouter.use(

@@ -4,7 +4,7 @@ const id = z.number().nonnegative();
 
 const name = z
   .string()
-  .regex(/^[\p{L}\p{N}]+$/u, "주제는 문자와 숫자로만 구성돼야 해요.")
+  .regex(/^[가-힣\da-zA-Z]*$/g, "주제는 문자와 숫자로만 구성돼야 해요.")
   .min(1)
   .max(20);
 
