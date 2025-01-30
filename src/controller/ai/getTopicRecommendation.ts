@@ -9,7 +9,7 @@ import type { WithRequired } from "utility";
 
 // 요청 body
 export const GetTopicRecommendationBody = z.object({
-  text: z.string().min(5).max(1000),
+  text: z.string().min(10).max(1000),
 });
 
 // 응답 body

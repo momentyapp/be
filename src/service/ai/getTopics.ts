@@ -47,7 +47,10 @@ export default async function getTopics({ text }: Props) {
   knwon.sort((a, b) => b.usage - a.usage);
 
   const unknown = topicNames.filter(
-    (topicName) => !knwon.find((topic) => topic.name === topicName)
+    (topicName) =>
+      !knwon.find(
+        (topic) => topic.name.toLowerCase() === topicName.toLowerCase()
+      )
   );
 
   return { knwon, unknown };
