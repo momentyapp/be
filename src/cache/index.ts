@@ -18,6 +18,9 @@ import setMomentTrendScore from "./moment/setTrendScore";
 import takeReactionSnapshot from "./moment/takeReactionSnapshot";
 import trimReactionSnapshot from "./moment/trimReactionSnapshot";
 
+import saveTopicRecommendation from "./ai/saveTopicRecommendation";
+import getTopicRecommendation from "./ai/getTopicRecommendation";
+
 export default class Cache {
   private constructor() {}
 
@@ -41,6 +44,11 @@ export default class Cache {
     setTrendScore: setMomentTrendScore,
     takeReactionSnapshot,
     trimReactionSnapshot,
+  };
+
+  static ai = {
+    saveTopicRecommendation,
+    getTopicRecommendation,
   };
 }
 
