@@ -11,7 +11,7 @@ interface Props {
   text: string;
 }
 
-export default async function getTopics({ text }: Props) {
+export default async function generateTopics({ text }: Props) {
   // 캐시 확인
   let topicNames: string[] = await Cache.ai.getTopicRecommendation({ text });
 
@@ -38,7 +38,7 @@ export default async function getTopics({ text }: Props) {
     })
   )[0];
 
-  const knwon: WithRequired<Topic, "usage">[] = await Promise.all(
+  const registered: WithRequired<Topic, "usage">[] = await Promise.all(
     topicRows.map(async (topicRow) => {
       const { id, name } = topicRow;
       const usage = await Cache.topic.getUsage({ topicId: id });
@@ -52,14 +52,14 @@ export default async function getTopics({ text }: Props) {
     })
   );
 
-  knwon.sort((a, b) => b.usage - a.usage);
+  registered.sort((a, b) => b.usage - a.usage);
 
-  const unknown = topicNames.filter(
+  const unregistered = topicNames.filter(
     (topicName) =>
-      !knwon.find(
+      !registered.find(
         (topic) => topic.name.toLowerCase() === topicName.toLowerCase()
       )
   );
 
-  return { knwon, unknown };
+  return { registered, unregistered };
 }

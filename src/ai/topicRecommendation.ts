@@ -18,9 +18,9 @@ const schema = {
 };
 
 const topicRecommendationModel = genAI.getGenerativeModel({
-  model: "gemini-1.5-pro-001",
+  model: "gemini-1.5-flash-8b",
   systemInstruction:
-    "Please recommend up to 5 relevant keywords for the given post. Keywords should not contain spaces or special characters. Keywords should be written in Korean if possible.",
+    "Please recommend up to 3 relevant keywords for the given post. Keywords should consists of single word and not contain special characters. Keywords should be written in Korean if possible.",
   generationConfig: {
     responseMimeType: "application/json",
     responseSchema: schema,

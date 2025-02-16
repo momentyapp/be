@@ -11,8 +11,7 @@ import increaseUsage from "./topic/increaseUsage";
 import updateTopicTrendScore from "./topic/updateTrendScore";
 import getTrendingTopics from "./topic/getTrendings";
 import search from "./topic/search";
-
-import getTopics from "./ai/getTopics";
+import generateTopics from "./topic/generateTopics";
 
 import createUser from "./user/create";
 
@@ -34,14 +33,11 @@ export default class Service {
     increaseUsage,
     updateTrendScore: updateTopicTrendScore,
     getTrendings: getTrendingTopics,
+    generate: generateTopics,
     search,
   };
 
   static user = {
     create: createUser,
-  };
-
-  static ai = {
-    getTopics,
   };
 }
