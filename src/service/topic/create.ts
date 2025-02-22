@@ -4,14 +4,16 @@ import isQueryError from "util/isQueryError";
 
 import ServerError from "error/ServerError";
 import ClientError from "error/ClientError";
-import Service from "service";
+
+import getEmbedding from "ai/getEmbedding";
+import addTopicEmbeddings from "ai/addTopicEmbedding";
 
 interface Props {
   name: string;
 }
 
 export default async function create({ name }: Props) {
-  // 주제 생성
+  // DB에 등록
   let queryResult;
   try {
     queryResult = await db.topic.create({ name });
@@ -34,7 +36,16 @@ export default async function create({ name }: Props) {
 
     throw error;
   }
-
   const topicId = queryResult[0].insertId;
+
+  // 임베딩 생성 후 등록
+  const embedding = await getEmbedding(name);
+  await addTopicEmbeddings([
+    {
+      id: topicId,
+      embedding,
+    },
+  ]);
+
   return topicId;
 }

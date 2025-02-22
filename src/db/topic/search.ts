@@ -25,7 +25,7 @@ export default async function search(
 ) {
   const queryResult = await conn.execute<QueryResultRow<Row>[]>(
     `
-    SELECT id, name FROM topic WHERE name LIKE ? LIMIT 5;
+    SELECT id, name FROM topic WHERE name LIKE ? LIMIT 3;
     `,
     [`%${query}%`]
   );
