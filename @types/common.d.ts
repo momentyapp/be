@@ -28,7 +28,15 @@ declare module "common" {
   export interface Topic {
     id: number;
     name: string;
-    trending?: boolean;
-    usage?: number;
+    trending: boolean;
+    usage: number;
+  }
+
+  export interface GeneratedTopic {
+    id: number;
+    name: string;
+    trending: boolean;
+    score?: number;
+    usage: number;
   }
 }

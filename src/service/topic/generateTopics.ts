@@ -3,38 +3,50 @@ import db from "db";
 
 import getTopKTopics from "ai/getTopKTopics";
 
+import type { GeneratedTopic } from "common";
+
 interface Props {
   text: string;
+  signal?: AbortSignal;
 }
 
-export default async function generateTopics({ text }: Props) {
-  const topKTopics = await getTopKTopics(text);
+export default function generateTopics({
+  text,
+  signal,
+}: Props): Promise<GeneratedTopic[]> {
+  return new Promise(async (resolve, reject) => {
+    signal?.addEventListener("abort", () => {
+      reject();
+    });
 
-  const topicRows =
-    topKTopics.length > 0
-      ? (
-          await db.topic.getByIds({
-            topicIds: topKTopics.map(({ id }) => id),
-          })
-        )[0]
-      : [];
+    const topKTopics = await getTopKTopics(text, 3, signal);
 
-  const trendingTopicIds = await Cache.topic.getTrendings();
+    const topicRows =
+      topKTopics.length > 0
+        ? (
+            await db.topic.getByIds({
+              topicIds: topKTopics.map(({ id }) => id),
+            })
+          )[0]
+        : [];
 
-  const result = await Promise.all(
-    topicRows.map(async (topicRow, index) => {
-      const { id, name } = topicRow;
-      const usage = await Cache.topic.getUsage({ topicId: id });
+    const trendingTopicIds = await Cache.topic.getTrendings();
 
-      return {
-        id,
-        name,
-        usage,
-        score: topKTopics[index].score,
-        trending: trendingTopicIds.includes(id),
-      };
-    })
-  );
+    const result = await Promise.all(
+      topicRows.map(async (topicRow, index) => {
+        const { id, name } = topicRow;
+        const usage = await Cache.topic.getUsage({ topicId: id });
 
-  return result;
+        return {
+          id,
+          name,
+          usage,
+          score: topKTopics[index].score,
+          trending: trendingTopicIds.includes(id),
+        };
+      })
+    );
+
+    resolve(result);
+  });
 }
