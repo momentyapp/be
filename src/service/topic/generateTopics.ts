@@ -1,45 +1,28 @@
 import Cache from "cache";
-import { Topic } from "common";
 import db from "db";
 
-import ServerError from "error/ServerError";
-import topicRecommendationModel from "ai/topicRecommendation";
-
-import type { WithRequired } from "utility";
+import getTopKTopics from "ai/getTopKTopics";
 
 interface Props {
   text: string;
 }
 
 export default async function generateTopics({ text }: Props) {
-  // 캐시 확인
-  let topicNames: string[] = await Cache.ai.getTopicRecommendation({ text });
+  const topKTopics = await getTopKTopics(text);
 
-  // 캐시에 없으면 생성
-  if (topicNames.length === 0) {
-    const result = await topicRecommendationModel.generateContent(text);
-    try {
-      topicNames = JSON.parse(result.response.text()).topics;
-    } catch (e) {
-      throw new ServerError("ai", "Unable to parse ai response");
-    }
+  const topicRows =
+    topKTopics.length > 0
+      ? (
+          await db.topic.getByIds({
+            topicIds: topKTopics.map(({ id }) => id),
+          })
+        )[0]
+      : [];
 
-    topicNames = topicNames.filter(
-      (topic) => topic.length <= 20 && /^[가-힣\da-zA-Z]*$/g.test(topic)
-    );
+  const trendingTopicIds = await Cache.topic.getTrendings();
 
-    // 캐시에 저장
-    await Cache.ai.saveTopicRecommendation({ text, topics: topicNames });
-  }
-
-  const topicRows = (
-    await db.topic.getByNames({
-      names: topicNames,
-    })
-  )[0];
-
-  const registered: WithRequired<Topic, "usage">[] = await Promise.all(
-    topicRows.map(async (topicRow) => {
+  const result = await Promise.all(
+    topicRows.map(async (topicRow, index) => {
       const { id, name } = topicRow;
       const usage = await Cache.topic.getUsage({ topicId: id });
 
@@ -47,19 +30,11 @@ export default async function generateTopics({ text }: Props) {
         id,
         name,
         usage,
-        trending: true,
+        score: topKTopics[index].score,
+        trending: trendingTopicIds.includes(id),
       };
     })
   );
 
-  registered.sort((a, b) => b.usage - a.usage);
-
-  const unregistered = topicNames.filter(
-    (topicName) =>
-      !registered.find(
-        (topic) => topic.name.toLowerCase() === topicName.toLowerCase()
-      )
-  );
-
-  return { registered, unregistered };
+  return result;
 }

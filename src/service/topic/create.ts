@@ -36,6 +36,5 @@ export default async function create({ name }: Props) {
   }
 
   const topicId = queryResult[0].insertId;
-  Service.topic.increaseUsage({ topicId });
   return topicId;
 }

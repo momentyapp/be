@@ -6,8 +6,6 @@ import ServerError from "error/ServerError";
 
 import type { ApiResponse } from "api";
 import type { RequestHandler } from "express";
-import type { Topic } from "common";
-import type { WithRequired } from "utility";
 
 // 요청 body
 export const GenerateTopicsQuery = z.object({
@@ -18,11 +16,11 @@ export const GenerateTopicsQuery = z.object({
 type ResponseBody = ApiResponse<{
   count: number;
   topics: {
-    registered: boolean;
-    id?: number;
+    id: number;
     name: string;
-    trending?: boolean;
-    usage?: number;
+    trending: boolean;
+    score?: number;
+    usage: number;
   }[];
 }>;
 
@@ -37,27 +35,7 @@ const generateTopics: RequestHandler<{}, ResponseBody, {}> = async function (
 
   const { text } = req.parsedQuery as z.infer<typeof GenerateTopicsQuery>;
 
-  let result: {
-    registered: WithRequired<Topic, "usage">[];
-    unregistered: string[];
-  };
-
-  try {
-    result = await Service.topic.generate({ text });
-  } catch (error) {
-    return next(error);
-  }
-
-  const topics = [
-    ...result.registered.map((topic) => ({
-      registered: true,
-      ...topic,
-    })),
-    ...result.unregistered.map((name) => ({
-      registered: false,
-      name,
-    })),
-  ];
+  const topics = await Service.topic.generate({ text });
 
   return res.status(200).json({
     message: "추천 주제를 불러왔어요.",
