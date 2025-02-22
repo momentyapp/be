@@ -6,11 +6,15 @@ import type { WithRequired } from "utility";
 
 export default async function getTrendings() {
   const topicIds = await Cache.topic.getTrendings();
-  const topicRows = (
-    await db.topic.getByIds({
-      topicIds,
-    })
-  )[0];
+
+  const topicRows =
+    topicIds.length > 0
+      ? (
+          await db.topic.getByIds({
+            topicIds,
+          })
+        )[0]
+      : [];
 
   const topics: WithRequired<Topic, "usage">[] = await Promise.all(
     topicRows.map(async (topicRow) => {
