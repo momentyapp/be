@@ -2,11 +2,11 @@ import { pc } from "ai";
 
 import getEmbedding from "./getEmbedding";
 
-export default async function getTopKTopics(query: string) {
+export default async function getTopKTopics(query: string, k: number = 3) {
   const embedding = await getEmbedding(query);
 
   const result = await pc.query({
-    topK: 3,
+    topK: k,
     vector: embedding,
   });
 

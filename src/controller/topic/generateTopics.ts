@@ -9,7 +9,7 @@ import type { RequestHandler } from "express";
 
 // 요청 body
 export const GenerateTopicsQuery = z.object({
-  text: z.string().min(10).max(1000),
+  text: z.string().min(1).max(1000),
 });
 
 // 응답 body
