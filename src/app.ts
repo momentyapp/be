@@ -6,6 +6,7 @@ import express from "express";
 
 import apiRouter from "routes/api";
 import fileRouter from "routes/file";
+import setZodErrorMap from "util/setZodErrorMap";
 
 dotenv.config();
 const isProduction = process.env.NODE_ENV === "production";
@@ -22,6 +23,9 @@ const corsOptions: cors.CorsOptions = isProduction
       origin: "https://example.com",
     }
   : {};
+
+// zod 에러 메시지
+setZodErrorMap();
 
 app.use(express.json());
 app.use(cors(corsOptions));
