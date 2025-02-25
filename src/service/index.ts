@@ -5,6 +5,7 @@ import getTrendingMoments from "./moment/getTrendings";
 import post from "./moment/post";
 import react from "./moment/react";
 import updateMomentTrendScore from "./moment/updateTrendScore";
+import getById from "./moment/getById";
 
 import createTopic from "./topic/create";
 import increaseUsage from "./topic/increaseUsage";
@@ -26,6 +27,7 @@ export default class Service {
     getTrendings: getTrendingMoments,
     post,
     react,
+    getById,
   };
 
   static topic = {
