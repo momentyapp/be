@@ -4,6 +4,8 @@ import { promises as fs } from "fs";
 
 import db, { pool } from "db";
 
+import { io } from "app";
+
 import isQueryError from "util/isQueryError";
 
 import ServerError from "error/ServerError";
@@ -106,7 +108,15 @@ export default async function post({
   conn.release();
 
   const momentId = queryResult[0].insertId;
+
   // 주제 사용 횟수 증가
   topicIds.forEach((topicId) => Service.topic.increaseUsage({ topicId }));
+
+  // socket emit
+  io.emit("new_moment", {
+    momentId,
+    topicIds,
+  });
+
   return momentId;
 }
