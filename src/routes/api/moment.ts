@@ -21,6 +21,9 @@ import getTrendingMoments, {
 import getMomentById, {
   GetMomentByIdRequestQuery,
 } from "controller/moment/getMomentById";
+import getMomentByIds, {
+  GetMomentByIdsRequestBody,
+} from "controller/moment/getMomentByIds";
 
 const momentRouter = express.Router();
 
@@ -72,6 +75,12 @@ momentRouter.get(
   "/getById",
   validateRequest({ query: GetMomentByIdRequestQuery }),
   getMomentById
+);
+momentRouter.post(
+  "/getByIds",
+  express.json(),
+  validateRequest({ body: GetMomentByIdsRequestBody }),
+  getMomentByIds
 );
 
 export default momentRouter;

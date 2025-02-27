@@ -6,6 +6,7 @@ import post from "./moment/post";
 import react from "./moment/react";
 import updateMomentTrendScore from "./moment/updateTrendScore";
 import getById from "./moment/getById";
+import getByIds from "./moment/getByIds";
 
 import createTopic from "./topic/create";
 import increaseUsage from "./topic/increaseUsage";
@@ -28,6 +29,7 @@ export default class Service {
     post,
     react,
     getById,
+    getByIds,
   };
 
   static topic = {

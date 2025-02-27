@@ -2,22 +2,19 @@ import { z } from "zod";
 
 import Service from "service";
 
-import ServerError from "error/ServerError";
-import NotFoundError from "error/NotFoundError";
-
 import momentZod from "zod/moment";
 
 import type { ApiResponse } from "api";
 import type { RequestHandler } from "express";
 
 // 요청 body
-export const GetMomentByIdRequestQuery = z.object({
-  momentId: momentZod.id,
+export const GetMomentByIdsRequestBody = z.object({
+  momentIds: momentZod.id.array(),
 });
 
 // 응답 body
 type ResponseBody = ApiResponse<{
-  moment: Moment;
+  moments: Moment[];
 }>;
 
 export interface Moment {
@@ -47,38 +44,29 @@ export interface Moment {
 }
 
 // 핸들러
-const getMomentById: RequestHandler<{}, ResponseBody, {}> = async function (
-  req,
-  res,
-  next
-) {
-  if (req.parsedQuery === undefined)
-    return new ServerError("query", "Unable to parse query");
-
+const getMomentById: RequestHandler<
+  {},
+  ResponseBody,
+  z.infer<typeof GetMomentByIdsRequestBody>
+> = async function (req, res, next) {
   const userId = req.userId;
-  const { momentId } = req.parsedQuery as z.infer<
-    typeof GetMomentByIdRequestQuery
-  >;
+  const { momentIds } = req.body;
 
   let moments: Moment[];
   try {
-    moments = await Service.moment.getById({
-      momentId,
+    moments = await Service.moment.getByIds({
+      momentIds,
       userId,
     });
   } catch (error) {
     return next(error);
   }
 
-  if (moments.length === 0) {
-    return new NotFoundError("모멘트");
-  }
-
   return res.status(200).json({
-    message: "모멘트를 불러왔어요.",
+    message: "모멘트 목록을 불러왔어요.",
     code: "success",
     result: {
-      moment: moments[0],
+      moments,
     },
   });
 };
