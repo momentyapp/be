@@ -25,11 +25,15 @@ const signup: RequestHandler<
   const { file: photo } = req;
   const { username, password } = req.body;
 
-  await Service.user.create({
-    username,
-    password,
-    photo,
-  });
+  try {
+    await Service.user.create({
+      username,
+      password,
+      photo,
+    });
+  } catch (e) {
+    return next(e);
+  }
 
   return res.status(200).json({
     message: "사용자가 생성됐어요.",
