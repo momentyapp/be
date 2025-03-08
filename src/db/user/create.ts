@@ -14,7 +14,7 @@ export default async function create(
   { username, hashedPassword, salt, photo }: Props,
   conn: Connection = pool
 ) {
-  const queryResult = await conn.execute<ResultSetHeader>(
+  const queryResult = await conn.query<ResultSetHeader>(
     "INSERT INTO user SET ?",
     {
       username,

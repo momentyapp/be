@@ -1,4 +1,4 @@
-import convertRows from "./moment/convertRows";
+import convertMomentRows from "./moment/convertRows";
 import get from "./moment/get";
 import getReactions from "./moment/getReactions";
 import getTrendingMoments from "./moment/getTrendings";
@@ -20,12 +20,13 @@ import getUser from "./user/get";
 
 import createToken from "./auth/createToken";
 import refreshToken from "./auth/refreshToken";
+import covertUserRows from "./user/convertRows";
 
 export default class Service {
   private constructor() {}
 
   static moment = {
-    convertRows,
+    convertRows: convertMomentRows,
     get,
     getReactions,
     updateTrendScore: updateMomentTrendScore,
@@ -48,6 +49,7 @@ export default class Service {
   static user = {
     create: createUser,
     get: getUser,
+    convertRows: covertUserRows,
   };
 
   static auth = {

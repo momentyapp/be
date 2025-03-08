@@ -3,6 +3,7 @@ import getSaltedHash from "util/getSaltedHash";
 import db from "db";
 
 import type { User } from "common";
+import Service from "service";
 
 interface Props {
   plainPassword: string;
@@ -24,12 +25,7 @@ export default async function get({ plainPassword, username }: Props) {
   });
   if (userRow[0].length !== 1) return null;
 
-  const user: User = {
-    id: userRow[0][0].id,
-    username: userRow[0][0].username,
-    createdAt: userRow[0][0].createdAt,
-    photo: userRow[0][0].photo ?? undefined,
-  };
+  const users = Service.user.convertRows({ userRows: userRow[0] });
 
-  return user
+  return users[0];
 }

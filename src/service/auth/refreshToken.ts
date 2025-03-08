@@ -8,13 +8,15 @@ import ExpiredTokenError from "error/ExpiredTokenError";
 import InvalidTokenError from "error/InvalidTokenError";
 import NotFoundError from "error/NotFoundError";
 
+import type { User } from "common";
 interface Props {
   refreshToken: string;
 }
 
-export default function refreshToken({
-  refreshToken,
-}: Props): Promise<ReturnType<typeof Service.auth.createToken>> {
+export default function refreshToken({ refreshToken }: Props): Promise<{
+  token: ReturnType<typeof Service.auth.createToken>;
+  user: User;
+}> {
   return new Promise((resolve, reject) => {
     const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
@@ -41,11 +43,13 @@ export default function refreshToken({
       // 사용자가 존재하는지 확인
       const userId = decodedJwt.userId;
       const userRow = await db.user.getById({ id: userId });
-      if (userRow === null) throw new NotFoundError("사용자");
+      if (userRow[0].length !== 1) throw new NotFoundError("사용자");
+
+      const user = Service.user.convertRows({ userRows: userRow[0] })[0];
 
       // JWT 토큰 생성
       const token = Service.auth.createToken({ id: userId });
-      resolve(token);
+      resolve({ token, user });
     });
   });
 }
