@@ -75,7 +75,7 @@ export default async function get(
       m.id DESC
     LIMIT 10
     `,
-    [userId || null, before ?? 2147483647]
+    [userId ?? null, before ?? 2147483647]
   );
 
   return queryResult;

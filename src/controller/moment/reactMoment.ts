@@ -41,11 +41,15 @@ const reactMoment: RequestHandler<
     );
   }
 
-  await Service.moment.react({
-    userId,
-    emoji,
-    momentId,
-  });
+  try {
+    await Service.moment.react({
+      userId,
+      emoji,
+      momentId,
+    });
+  } catch (error) {
+    return next(error);
+  }
 
   const reactions = await Service.moment.getReactions({
     momentId,

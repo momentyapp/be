@@ -77,7 +77,7 @@ export default async function getByTopics(
       m.id DESC
     LIMIT 10
     `,
-    [userId || null, topicIds.join(","), before ?? 2147483647]
+    [userId ?? null, topicIds.join(","), before ?? 2147483647]
   );
 
   return queryResult;
