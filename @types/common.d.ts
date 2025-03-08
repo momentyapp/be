@@ -39,4 +39,16 @@ declare module "common" {
     score?: number;
     usage: number;
   }
+
+  export interface User {
+    id: number;
+    username: string;
+    createdAt: string;
+    photo?: string;
+  }
+
+  interface Token {
+    token: string;
+    expiresAt: string;
+  }
 }

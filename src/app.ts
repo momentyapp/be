@@ -16,7 +16,7 @@ const isProduction = process.env.NODE_ENV === "production";
 axios.defaults.validateStatus = () => true;
 
 // 서버 설정
-const port = 8080;
+const port = isProduction ? 6061 : 7071;
 export const app = express();
 export const server = createServer(app);
 

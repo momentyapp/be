@@ -16,6 +16,10 @@ import search from "./topic/search";
 import generateTopics from "./topic/generateTopics";
 
 import createUser from "./user/create";
+import getUser from "./user/get";
+
+import createToken from "./auth/createToken";
+import refreshToken from "./auth/refreshToken";
 
 export default class Service {
   private constructor() {}
@@ -43,5 +47,11 @@ export default class Service {
 
   static user = {
     create: createUser,
+    get: getUser,
+  };
+
+  static auth = {
+    createToken,
+    refreshToken,
   };
 }
