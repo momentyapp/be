@@ -5,6 +5,7 @@ import validateRequest from "middleware/validate/validateRequest";
 import trimBodyString from "middleware/common/trimBodyString";
 import parseJSON from "middleware/common/parseJSON";
 import requireUserToken from "middleware/token/requireUserToken";
+import requireUserTokenOptionally from "middleware/token/requireUserTokenOptionally";
 
 import postMoment, {
   PostMomentRequestBody,
@@ -49,6 +50,7 @@ momentRouter.post(
   parseJSON,
   trimBodyString,
   validateRequest({ body: PostMomentRequestBody }),
+  requireUserTokenOptionally,
   postMoment
 );
 momentRouter.post(
@@ -56,30 +58,34 @@ momentRouter.post(
   express.json(),
   trimBodyString,
   validateRequest({ body: GetMomentsRequestBody }),
+  requireUserTokenOptionally,
   getMoments
 );
 momentRouter.post(
   "/reaction",
   express.json(),
-  requireUserToken,
   trimBodyString,
   validateRequest({ body: ReactMomentRequestBody }),
+  requireUserToken,
   reactMoment
 );
 momentRouter.get(
   "/trend",
   validateRequest({ query: GetTrendingMomentsRequestQuery }),
+  requireUserTokenOptionally,
   getTrendingMoments
 );
 momentRouter.get(
   "/getById",
   validateRequest({ query: GetMomentByIdRequestQuery }),
+  requireUserTokenOptionally,
   getMomentById
 );
 momentRouter.post(
   "/getByIds",
   express.json(),
   validateRequest({ body: GetMomentByIdsRequestBody }),
+  requireUserTokenOptionally,
   getMomentByIds
 );
 
