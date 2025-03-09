@@ -15,7 +15,7 @@ export default async function getTopKTopics(
   });
 
   const filtered = result.matches.filter(
-    (match) => match.score !== undefined && match.score > 0.5
+    (match) => match.score !== undefined && match.score > 0.3
   );
 
   return filtered.map((match) => ({
