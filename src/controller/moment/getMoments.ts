@@ -56,11 +56,7 @@ const getMoments: RequestHandler<
 
   let moments: Moment[];
   try {
-    moments = await Service.moment.get({
-      topicIds,
-      before,
-      userId,
-    });
+    moments = await Service.moment.get({ topicIds, before, userId });
   } catch (error) {
     return next(error);
   }

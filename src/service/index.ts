@@ -1,5 +1,5 @@
 import convertMomentRows from "./moment/convertRows";
-import get from "./moment/get";
+import getByTopicIds from "./moment/getByTopicIds";
 import getReactions from "./moment/getReactions";
 import getTrendingMoments from "./moment/getTrendings";
 import post from "./moment/post";
@@ -7,6 +7,8 @@ import react from "./moment/react";
 import updateMomentTrendScore from "./moment/updateTrendScore";
 import getById from "./moment/getById";
 import getByIds from "./moment/getByIds";
+import getByEmbeddings from "./moment/getByEmbeddings";
+import get from "./moment/get";
 
 import createTopic from "./topic/create";
 import increaseUsage from "./topic/increaseUsage";
@@ -27,7 +29,7 @@ export default class Service {
 
   static moment = {
     convertRows: convertMomentRows,
-    get,
+    getByTopicIds,
     getReactions,
     updateTrendScore: updateMomentTrendScore,
     getTrendings: getTrendingMoments,
@@ -35,6 +37,8 @@ export default class Service {
     react,
     getById,
     getByIds,
+    getByEmbeddings,
+    get,
   };
 
   static topic = {

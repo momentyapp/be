@@ -1,15 +1,10 @@
-import { momentIndex } from "ai";
-
-import getEmbedding from "./getEmbedding";
+import { pinecone, momentIndex } from "ai";
 
 export default async function getTopKMoments(
-  query: string,
-  k: number = 3,
-  signal?: AbortSignal
+  embedding: number[],
+  k: number = 3
 ) {
-  const embedding = await getEmbedding(query, signal);
-
-  const result = await momentIndex.query({
+  const result = await pinecone.index("moment").query({
     topK: k,
     vector: embedding,
   });

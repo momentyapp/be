@@ -1,5 +1,7 @@
-import db from "db";
 import Service from "service";
+import getTopicEmbedding from "ai/getTopicEmbedding";
+
+import type { Moment } from "common";
 
 interface Props {
   topicIds: number[];
@@ -8,17 +10,22 @@ interface Props {
 }
 
 export default async function get({ topicIds, before, userId }: Props) {
-  let momentRows;
-  if (topicIds.length === 0)
-    momentRows = await db.moment.get({ before, userId });
-  else
-    momentRows = await db.moment.getByTopics({
-      topicIds,
-      before,
-      userId,
-    });
+  const topicEmbeddings = (
+    await Promise.all(
+      topicIds.map(async (topicId) => await getTopicEmbedding(topicId))
+    )
+  ).filter((embedding) => embedding !== null);
 
-  const moments = Service.moment.convertRows({ momentRows: momentRows[0] });
+  const moments: Moment[] = (
+    await Promise.all([
+      Service.moment.getByEmbeddings({
+        embeddings: topicEmbeddings,
+        before,
+        userId,
+      }),
+      Service.moment.getByTopicIds({ topicIds, before, userId }),
+    ])
+  ).flat();
 
   return moments;
 }
