@@ -9,9 +9,14 @@ const pinecone = new Pinecone({
   apiKey: process.env.PINECONE_KEY!,
 });
 
-const pc = pinecone.index("topic", process.env.PINECONE_HOST!).namespace("");
+const topicIndex = pinecone
+  .index("topic", process.env.PINECONE_HOST!)
+  .namespace("");
+const momentIndex = pinecone
+  .index("moment", process.env.PINECONE_HOST!)
+  .namespace("");
 
 // Huggingface
 const hf = new HfInference(process.env.HF_KEY!);
 
-export { pc, hf };
+export { topicIndex, momentIndex, hf };

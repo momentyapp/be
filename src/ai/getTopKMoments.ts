@@ -1,15 +1,15 @@
-import { topicIndex } from "ai";
+import { momentIndex } from "ai";
 
 import getEmbedding from "./getEmbedding";
 
-export default async function getTopKTopics(
+export default async function getTopKMoments(
   query: string,
   k: number = 3,
   signal?: AbortSignal
 ) {
   const embedding = await getEmbedding(query, signal);
 
-  const result = await topicIndex.query({
+  const result = await momentIndex.query({
     topK: k,
     vector: embedding,
   });
