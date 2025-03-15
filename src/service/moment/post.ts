@@ -11,6 +11,8 @@ import isQueryError from "util/isQueryError";
 import ServerError from "error/ServerError";
 import ClientError from "error/ClientError";
 import Service from "service";
+import getEmbedding from "ai/getEmbedding";
+import addMomentEmbedding from "ai/addMomentEmbedding";
 
 interface Props {
   photos?: Express.Multer.File[];
@@ -111,6 +113,13 @@ export default async function post({
 
   // 주제 사용 횟수 증가
   topicIds.forEach((topicId) => Service.topic.increaseUsage({ topicId }));
+
+  // 임베딩 추가
+  async function addEmbedding() {
+    const embedding = await getEmbedding(text);
+    await addMomentEmbedding([{ id: momentId, embedding }]);
+  }
+  addEmbedding();
 
   // socket emit
   io.emit("new_moment", {
