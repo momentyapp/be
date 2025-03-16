@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import axios from "axios";
 import { Pinecone } from "@pinecone-database/pinecone";
 import { HfInference } from "@huggingface/inference";
 
@@ -17,4 +18,9 @@ const momentIndex = pinecone.index("moment");
 // Huggingface
 const hf = new HfInference(process.env.HF_KEY!);
 
-export { pinecone, topicIndex, momentIndex, hf };
+// axios
+const axiosInstance = axios.create({
+  baseURL: `http://localhost:6062`,
+});
+
+export { pinecone, topicIndex, momentIndex, hf, axiosInstance };

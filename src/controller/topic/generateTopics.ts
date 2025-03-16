@@ -17,11 +17,12 @@ export const GenerateTopicsQuery = z.object({
 type ResponseBody = ApiResponse<{
   count: number;
   topics: {
-    id: number;
+    id?: number;
     name: string;
-    trending: boolean;
-    score?: number;
-    usage: number;
+    trending?: boolean;
+    score: number;
+    usage?: number;
+    known: boolean;
   }[];
 }>;
 

@@ -33,11 +33,12 @@ declare module "common" {
   }
 
   export interface GeneratedTopic {
-    id: number;
+    id?: number;
     name: string;
-    trending: boolean;
-    score?: number;
-    usage: number;
+    trending?: boolean;
+    score: number;
+    usage?: number;
+    known: boolean;
   }
 
   export interface User {
