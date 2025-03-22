@@ -3,9 +3,9 @@ import cors from "cors";
 import debug from "debug";
 import dotenv from "dotenv";
 import express from "express";
-import { Server } from "socket.io";
 import { createServer } from "http";
 
+import Socket from "socket";
 import apiRouter from "routes/api";
 import fileRouter from "routes/file";
 import setZodErrorMap from "util/setZodErrorMap";
@@ -32,9 +32,8 @@ const log = debug("app:log");
 setZodErrorMap();
 
 // socket.io 등록
-export const io = new Server(server, { path: "/socket" });
-
-app.set("socket", io);
+const socket = new Socket(server);
+app.set("socket", Socket.io);
 
 server.listen(port, () => {
   log(`Server is running on port ${port}`);

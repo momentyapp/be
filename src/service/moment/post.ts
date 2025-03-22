@@ -3,8 +3,7 @@ import Crypto from "crypto";
 import { promises as fs } from "fs";
 
 import db, { pool } from "db";
-
-import { io } from "app";
+import Socket from "socket";
 
 import isQueryError from "util/isQueryError";
 
@@ -117,14 +116,24 @@ export default async function post({
   topicIds.forEach((topicId) => Service.topic.increaseUsage({ topicId }));
 
   // 임베딩 추가
-  const momentEmbedding = await getEmbedding(text);
-  await addMomentEmbedding([{ id: momentId, embedding: momentEmbedding }]);
+  if (text.length >= 10) {
+    const momentEmbedding = await getEmbedding(text);
+    await addMomentEmbedding([{ id: momentId, embedding: momentEmbedding }]);
+  }
+
+  const moments = await Service.moment.getById({ momentId, userId });
 
   // socket emit
-  io.emit("new_moment", {
-    momentId,
-    topicIds,
-  });
+  if (moments.length > 0) {
+    const moment = moments[0];
+    Socket.topicSubscription.forEach((topicIds, socketId) => {
+      if (
+        topicIds.size === 0 ||
+        moment.topics.some((topic) => topicIds.has(topic.id))
+      )
+        Socket.io.to(socketId).emit("new_moment", moment);
+    });
+  }
 
   return momentId;
 }
