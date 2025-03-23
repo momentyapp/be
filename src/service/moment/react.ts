@@ -1,9 +1,11 @@
 import db from "db";
 import Cache from "cache";
+import Service from "service";
+import Socket from "socket";
+
+import isQueryError from "util/isQueryError";
 
 import ClientError from "error/ClientError";
-import isQueryError from "util/isQueryError";
-import Service from "service";
 
 interface Props {
   userId: number;
@@ -52,23 +54,31 @@ export default async function react({ userId, emoji, momentId }: Props) {
     reaction = await Cache.moment.decreaseReaction({ momentId });
   }
 
-  (async () => {
-    // 스냅샷 생성
-    const timestamp = Math.floor(Date.now() / 1000 / 60);
-    const snapshotCount = await Cache.moment.takeReactionSnapshot({
-      momentId,
-      reaction,
-      timestamp,
-    });
+  // 스냅샷 생성
+  const timestamp = Math.floor(Date.now() / 1000 / 60);
+  const snapshotCount = await Cache.moment.takeReactionSnapshot({
+    momentId,
+    reaction,
+    timestamp,
+  });
 
-    // 트렌드 점수 업데이트
-    await Service.moment.updateTrendScore({
-      momentId,
-      snapshotCount,
-      reaction,
-      timestamp,
-    });
-  })();
+  // 트렌드 점수 업데이트
+  await Service.moment.updateTrendScore({
+    momentId,
+    snapshotCount,
+    reaction,
+    timestamp,
+  });
 
-  return reaction;
+  const reactions = await Service.moment.getReactions({
+    momentId,
+  });
+
+  // socket emit
+  Socket.momentSubscription.forEach((momentIds, socketId) => {
+    if (momentIds.has(momentId))
+      Socket.io.to(socketId).emit("modify_moment", momentId, { reactions });
+  });
+
+  return reactions;
 }

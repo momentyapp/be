@@ -41,8 +41,10 @@ const reactMoment: RequestHandler<
     );
   }
 
+  let reactions: Record<string, number>;
+
   try {
-    await Service.moment.react({
+    reactions = await Service.moment.react({
       userId,
       emoji,
       momentId,
@@ -50,10 +52,6 @@ const reactMoment: RequestHandler<
   } catch (error) {
     return next(error);
   }
-
-  const reactions = await Service.moment.getReactions({
-    momentId,
-  });
 
   return res.status(200).json({
     message: "반응을 등록했어요.",
